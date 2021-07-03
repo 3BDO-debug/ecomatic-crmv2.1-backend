@@ -23,7 +23,7 @@ def client_lookup_handler(request):
     return Response(client_lookup_response)
 
 
-@api_view(["GET", "POST"])
+@api_view(["GET", "POST", "DELETE"])
 def clients_handler(request):
     if request.method == "GET":
 
