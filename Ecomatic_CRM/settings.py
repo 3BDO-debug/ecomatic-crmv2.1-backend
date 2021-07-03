@@ -62,6 +62,7 @@ AUTH_USER_MODEL = "Accounts.User"
 ROOT_URLCONF = "Ecomatic_CRM.urls"
 CORS_ORIGIN_WHITELIST = [
     "http://localhost:3000",
+    "https://ecomatic-crm-v2-0-frontend.vercel.app",
 ]
 
 TEMPLATES = [
