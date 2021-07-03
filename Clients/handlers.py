@@ -30,7 +30,7 @@ def clients_handler(request):
         clients = models.Client.objects.all()
         client_serializer = serializers.ClientsSerializer(clients, many=True)
         return Response(client_serializer.data)
-    else:
+    elif request.method == "POST":
         created_client = models.Client.objects.get_or_create(
             client_full_name=request.data.get("clientFullName"),
             client_phone_number_1=request.data.get("clientPhoneNumber1"),
@@ -44,6 +44,12 @@ def clients_handler(request):
         client_serializer = serializers.ClientsSerializer(created_client[0], many=False)
 
         return Response(status=status.HTTP_201_CREATED, data=client_serializer.data)
+    elif request.method == "DELETE":
+        client_to_be_deleted = models.Client.objects.get(
+            id=int(request.data.get("clientId"))
+        )
+        client_to_be_deleted.delete()
+        return Response(status=status.HTTP_200_OK)
 
 
 @api_view(["GET", "PUT"])
