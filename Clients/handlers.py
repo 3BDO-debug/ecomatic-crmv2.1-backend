@@ -31,7 +31,7 @@ def clients_handler(request):
         client_serializer = serializers.ClientsSerializer(clients, many=True)
         return Response(client_serializer.data)
     else:
-        created_client = models.Client.objects.create(
+        created_client = models.Client.objects.get_or_create(
             client_full_name=request.data.get("clientFullName"),
             client_phone_number_1=request.data.get("clientPhoneNumber1"),
             client_phone_number_2=request.data.get("clientPhoneNumber2"),
@@ -41,7 +41,7 @@ def clients_handler(request):
             client_address_1=request.data.get("clientAddress1"),
             client_address_2=request.data.get("clientAddress1"),
         )
-        client_serializer = serializers.ClientsSerializer(created_client, many=False)
+        client_serializer = serializers.ClientsSerializer(created_client[1], many=False)
         created_client.save()
         return Response(status=status.HTTP_201_CREATED, data=client_serializer.data)
 
