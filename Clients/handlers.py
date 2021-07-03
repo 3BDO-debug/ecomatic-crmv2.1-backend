@@ -41,8 +41,8 @@ def clients_handler(request):
             client_address_1=request.data.get("clientAddress1"),
             client_address_2=request.data.get("clientAddress1"),
         )
-        client_serializer = serializers.ClientsSerializer(created_client[1], many=False)
-        created_client.save()
+        client_serializer = serializers.ClientsSerializer(created_client[0], many=False)
+
         return Response(status=status.HTTP_201_CREATED, data=client_serializer.data)
 
 
