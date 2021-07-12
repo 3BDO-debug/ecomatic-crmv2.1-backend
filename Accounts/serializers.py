@@ -1,6 +1,6 @@
-from django.db.models import fields
 from . import models
 from rest_framework import serializers
+
 
 class AccountsSerializers(serializers.ModelSerializer):
     class Meta:

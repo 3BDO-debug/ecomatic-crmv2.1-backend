@@ -10,4 +10,5 @@ urlpatterns = [
     path("Ticket-Types", handlers.ticket_types_handler),
     path("Ticket-Status", handlers.ticket_status_handler),
     path("Common-Diagnostics/<str:category_name>", handlers.common_diagnostics_handler),
+    path("Clients-Categories", handlers.clients_categories_handler),
 ]

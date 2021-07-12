@@ -47,3 +47,9 @@ class CommonDiagnosticSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.CommonDiagnostics
         fields = "__all__"
+
+
+class ClientCategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.ClientCategory
+        fields = "__all__"

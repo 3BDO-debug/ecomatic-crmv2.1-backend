@@ -56,3 +56,12 @@ def common_diagnostics_handler(request, category_name):
         common_diagnostics, many=True
     )
     return Response(common_diagnostics_serializer.data)
+
+
+@api_view(["GET"])
+def clients_categories_handler(request):
+    clients_categories = models.ClientCategory.objects.all()
+    clients_categories_serializer = serializers.ClientCategorySerializer(
+        clients_categories, many=True
+    )
+    return Response(data=clients_categories_serializer.data)

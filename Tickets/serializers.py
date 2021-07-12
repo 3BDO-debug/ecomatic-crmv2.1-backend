@@ -41,15 +41,21 @@ class TicketDeviceSerializers(serializers.ModelSerializer):
         rep[
             "device_model_number"
         ] = instance.related_client_device.related_storage_item.item_model_number
-        rep["device_brand"] = instance.related_client_device.related_brand.brand_name
+        rep["device_brand"] = instance.related_client_device.related_storage_item.brand
         rep[
             "device_category"
-        ] = instance.related_client_device.related_category.category_name
+        ] = instance.related_client_device.related_storage_item.category
         rep[
             "device_feeding_source"
         ] = instance.related_client_device.device_feeding_source
 
         return rep
+
+
+class TicketDeviceSparepartsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.TicketDeviceSpareparts
+        fields = "__all__"
 
 
 class TicketUpdateSerializers(serializers.ModelSerializer):

@@ -41,13 +41,7 @@ class TicketDevice(models.Model):
         null=True,
         verbose_name="Related Client Device",
     )
-    related_secondary_custody = models.ForeignKey(
-        Storage_Models.Item,
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True,
-        verbose_name="Related Secondary Custody",
-    )
+
     device_ticket_type = models.CharField(
         max_length=350, verbose_name="Device Ticket type"
     )
@@ -70,6 +64,28 @@ class TicketDevice(models.Model):
 
     def __str__(self):
         return f"{self.related_ticket.related_client.client_full_name}'s Related Device"
+
+
+class TicketDeviceSpareparts(models.Model):
+    related_ticket_device = models.ForeignKey(
+        TicketDevice, on_delete=models.CASCADE, verbose_name="Related Ticket Device"
+    )
+    assigned_sparepart = models.ForeignKey(
+        Storage_Models.SparePart,
+        on_delete=models.CASCADE,
+        verbose_name="Assigned Spareparts",
+        null=True,
+        blank=True,
+    )
+    required_qty = models.IntegerField(verbose_name="Required QTY")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Created At")
+
+    class Meta:
+        verbose_name = "Ticket Device Spareparts"
+        verbose_name_plural = "Tickets Devices Spareparts"
+
+    def __str__(self):
+        return f"New Spareparts assigned for {self.related_ticket_device.related_client_device.related_storage_item.item_name}"
 
 
 class TicketUpdate(models.Model):

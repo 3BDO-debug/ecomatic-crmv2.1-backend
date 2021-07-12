@@ -105,3 +105,15 @@ class CommonDiagnostics(models.Model):
 
     def __str__(self):
         return self.issue_type
+
+
+class ClientCategory(models.Model):
+    client_category = models.CharField(max_length=350, verbose_name="Client Category")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Created at")
+
+    class Meta:
+        verbose_name = "Client Category"
+        verbose_name_plural = "Clients Categories"
+
+    def __str__(self):
+        return self.client_category

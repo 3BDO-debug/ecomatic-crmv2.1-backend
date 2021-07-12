@@ -1,8 +1,10 @@
 from . import models, serializers
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 from Accounts import models as Accounts_Models
+from ast import literal_eval
 
 
 @api_view(["GET", "POST", "DELETE"])
@@ -26,10 +28,14 @@ def warehouses_handler(request):
         return Response(status=status.HTTP_201_CREATED, data=warehouse_serializer.data)
 
     elif request.method == "DELETE":
-        warehouse_to_be_deleted = models.Warehouse.objects.get(id=request.data.get("warehouseId"))
-        warehouse_to_be_deleted.delete()
-        return Response(status=status.HTTP_200_OK)
 
+        models.Warehouse.objects.filter(
+            id__in=literal_eval(request.data.get("warehousesToBeDeleted"))
+        ).delete()
+
+        warehouses = models.Warehouse.objects.all()
+        warehouses_serializer = serializers.WarehouseSerializers(warehouses, many=True)
+        return Response(status=status.HTTP_200_OK, data=warehouses_serializer.data)
 
 
 @api_view(["GET", "POST", "DELETE"])
@@ -56,9 +62,12 @@ def items_handler(request):
         return Response(status=status.HTTP_201_CREATED, data=items_serializer.data)
     elif request.method == "DELETE":
 
-        item_to_be_deleted = models.Item.objects.get(id=request.data.get("itemId"))
-        item_to_be_deleted.delete()
-        return Response(status=status.HTTP_200_OK)
+        models.Item.objects.filter(
+            id__in=literal_eval(request.data.get("itemsToBeDeleted"))
+        ).delete()
+        items = models.Item.objects.all()
+        items_serializer = serializers.ItemSerializers(items, many=True)
+        return Response(status=status.HTTP_200_OK, data=items_serializer.data)
 
 
 @api_view(["GET", "POST", "DELETE"])
@@ -86,10 +95,14 @@ def spare_parts_handler(request):
         return Response(
             status=status.HTTP_201_CREATED, data=spare_parts_serializer.data
         )
-    elif request.method == "DELETE" :
-        sparepart_to_be_deleted = models.SparePart.objects.get(id=request.data.get("sparepartId"))
-        sparepart_to_be_deleted.delete()
-        return Response(status=status.HTTP_200_OK)
+    elif request.method == "DELETE":
+        models.SparePart.objects.filter(
+            id__in=literal_eval(request.data.get("sparepartsToBeDeleted"))
+        ).delete()
+        spareparts = models.SparePart.objects.all()
+        spareparts_serializer = serializers.SparePartSerializers(spareparts, many=True)
+        return Response(status=status.HTTP_200_OK, data=spareparts_serializer.data)
+
 
 @api_view(["GET"])
 def custody_handler(request):

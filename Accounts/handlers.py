@@ -1,8 +1,13 @@
 from . import models, serializers
-from rest_framework.decorators import api_view
+from rest_framework.decorators import (
+    api_view,
+    authentication_classes,
+    permission_classes,
+)
 from rest_framework.response import Response
 from rest_framework import status
-from django.contrib.auth import authenticate, login
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.authentication import JWTAuthentication
 
 
 @api_view(["GET"])
@@ -23,6 +28,8 @@ def accounts_handler(request, account_type):
 
 
 @api_view(["POST"])
+@authentication_classes([])
+@permission_classes([])
 def email_username_lookup_handler(request):
 
     if models.User.objects.filter(
@@ -38,6 +45,8 @@ def email_username_lookup_handler(request):
 
 
 @api_view(["POST"])
+@authentication_classes([])
+@permission_classes([])
 def signup_handler(request):
     models.User.objects.create_user(
         first_name=request.data.get("firstName"),
@@ -55,16 +64,24 @@ def signup_handler(request):
     return Response(status=status.HTTP_201_CREATED)
 
 
+@api_view(["GET"])
+@authentication_classes([JWTAuthentication])
+def user_info_handler(request):
+    user = models.User.objects.get(id=request.user.id)
+    user_serializer = serializers.AccountsSerializers(user, many=False)
+    return Response(user_serializer.data)
+
+
 @api_view(["POST"])
-def signin_handler(request):
-    username = request.data.get("username")
-    password = request.data.get("password")
-    user_to_be_authenticated = authenticate(
-        request, username=username, password=password
-    )
-    if user_to_be_authenticated:
-        user_serializer = serializers.AccountsSerializers(
-            user_to_be_authenticated, many=False
-        )
-        login(request, user_to_be_authenticated)
-        return Response(status=status.HTTP_200_OK, data=user_serializer.data)
+def signout_handler(request):
+    refresh_token = request.data.get("refresh_token")
+    token = RefreshToken(refresh_token)
+    token.blacklist()
+    return Response(status=status.HTTP_205_RESET_CONTENT)
+
+
+@api_view(["GET"])
+def account_details_handler(request, account_id):
+    user = models.User.objects.get(id=int(account_id))
+    user_serializer = serializers.AccountsSerializers(user, many=False)
+    return Response(user_serializer.data)

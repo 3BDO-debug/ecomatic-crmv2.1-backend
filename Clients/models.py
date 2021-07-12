@@ -7,6 +7,11 @@ from Configurations import models as Configurations_Models
 
 class Client(models.Model):
     client_full_name = models.CharField(max_length=750, verbose_name="Client Full Name")
+    client_category = models.ForeignKey(
+        Configurations_Models.ClientCategory,
+        on_delete=models.CASCADE,
+        verbose_name="Client Category",
+    )
     client_phone_number_1 = models.CharField(
         max_length=750, verbose_name="Client Phone Number 1"
     )
@@ -34,20 +39,7 @@ class ClientDevice(models.Model):
     related_client = models.ForeignKey(
         Client, on_delete=models.CASCADE, verbose_name="Related Client"
     )
-    related_brand = models.ForeignKey(
-        Configurations_Models.Brand,
-        on_delete=models.CASCADE,
-        verbose_name="Related Brand",
-        null=True,
-        blank=True,
-    )
-    related_category = models.ForeignKey(
-        Configurations_Models.Category,
-        on_delete=models.CASCADE,
-        verbose_name="Related Category",
-        null=True,
-        blank=True,
-    )
+
     related_storage_item = models.ForeignKey(
         Storage_Models.Item,
         on_delete=models.CASCADE,
@@ -59,7 +51,6 @@ class ClientDevice(models.Model):
         max_length=350, verbose_name="Device Feeding Source"
     )
     purchasing_date = models.DateField(verbose_name="Purchasing Date")
-    installation_visit_date = models.DateField(verbose_name="Installation Visit Date")
     installation_date = models.DateField(verbose_name="Installation Date")
     warranty_start_date = models.DateField(verbose_name="Warranty Start Date")
     related_branch = models.ForeignKey(

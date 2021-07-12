@@ -1,11 +1,18 @@
 import datetime
 from . import models, serializers
-from rest_framework.decorators import api_view
+from rest_framework.decorators import (
+    api_view,
+    permission_classes,
+    authentication_classes,
+)
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 from Configurations import models as Configurations_Models
 from Storage import models as Storage_Models
 from Tickets import models as Tickets_Models, serializers as Tickets_Serializers
+from ast import literal_eval
 
 
 @api_view(["POST"])
@@ -25,6 +32,7 @@ def client_lookup_handler(request):
 
 @api_view(["GET", "POST", "DELETE"])
 def clients_handler(request):
+
     if request.method == "GET":
 
         clients = models.Client.objects.all()
@@ -33,6 +41,9 @@ def clients_handler(request):
     elif request.method == "POST":
         created_client = models.Client.objects.get_or_create(
             client_full_name=request.data.get("clientFullName"),
+            client_category=Configurations_Models.ClientCategory.objects.get(
+                id=int(request.data.get("clientCategoryId"))
+            ),
             client_phone_number_1=request.data.get("clientPhoneNumber1"),
             client_phone_number_2=request.data.get("clientPhoneNumber2"),
             client_landline_number=request.data.get("clientLandlineNumber"),
@@ -45,11 +56,12 @@ def clients_handler(request):
 
         return Response(status=status.HTTP_201_CREATED, data=client_serializer.data)
     elif request.method == "DELETE":
-        client_to_be_deleted = models.Client.objects.get(
-            id=int(request.data.get("clientId"))
-        )
-        client_to_be_deleted.delete()
-        return Response(status=status.HTTP_200_OK)
+        models.Client.objects.filter(
+            id__in=literal_eval(request.data.get("clientsToBeDeleted"))
+        ).delete()
+        clients = models.Client.objects.all()
+        clients_serializer = serializers.ClientsSerializer(clients, many=True)
+        return Response(status=status.HTTP_200_OK, data=clients_serializer.data)
 
 
 @api_view(["GET", "PUT"])
@@ -62,6 +74,9 @@ def client_details_handler(request, client_id):
         return Response(client_serializer.data)
     elif request.method == "PUT":
         client.client_full_name = request.data.get("client_full_name")
+        client.client_category = Configurations_Models.ClientCategory.objects.get(
+            id=int(request.data.get("clientCategoryId"))
+        )
         client.client_phone_number_1 = request.data.get("client_phone_number_1")
         client.client_phone_number_2 = request.data.get("client_phone_number_2")
         client.client_landline_number = request.data.get("client_landline_number")
@@ -83,21 +98,14 @@ def client_devices_handler(request, client_id):
         )
         return Response(client_devices_serializer.data)
     elif request.method == "POST":
-        print(request.data.get("purchasingDate"))
+
         created_client_device = models.ClientDevice.objects.create(
             related_client=client,
-            related_brand=Configurations_Models.Brand.objects.get(
-                id=int(request.data.get("selectedBrand"))
-            ),
-            related_category=Configurations_Models.Category.objects.get(
-                id=int(request.data.get("selectedCategory"))
-            ),
             related_storage_item=Storage_Models.Item.objects.get(
                 id=int(request.data.get("selectedItem"))
             ),
             device_feeding_source=request.data.get("selectedDeviceFeedingSource"),
             purchasing_date=request.data.get("purchasingDate"),
-            installation_visit_date=request.data.get("installationVisitDate"),
             installation_date=request.data.get("installationDate"),
             warranty_start_date=request.data.get("warrantyStartDate"),
             related_branch=Configurations_Models.Branch.objects.get(
@@ -115,11 +123,14 @@ def client_devices_handler(request, client_id):
             status=status.HTTP_201_CREATED, data=client_device_serializer.data
         )
     elif request.method == "DELETE":
-        client_device = models.ClientDevice.objects.get(
-            id=int(request.data.get("clientDeviceId"))
+        models.ClientDevice.objects.filter(
+            id__in=literal_eval(request.data.get("clientDevicesToBeDeleted"))
+        ).delete()
+        client_devices = models.ClientDevice.objects.all()
+        client_devices_serializer = serializers.ClientDeviceSerializer(
+            client_devices, many=True
         )
-        client_device.delete()
-        return Response(status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_200_OK, data=client_devices_serializer.data)
 
 
 @api_view(["GET"])
