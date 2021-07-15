@@ -21,10 +21,24 @@ class Client(models.Model):
     client_landline_number = models.CharField(
         max_length=750, verbose_name="Client Landline Number"
     )
-    client_city = models.CharField(max_length=350, verbose_name="Client City")
-    client_region = models.CharField(max_length=350, verbose_name="Client Region")
-    client_address_1 = models.CharField(max_length=750, verbose_name="Client Address 1")
-    client_address_2 = models.CharField(max_length=750, verbose_name="Client Address 2")
+    client_city = models.ForeignKey(
+        Configurations_Models.City, on_delete=models.CASCADE, verbose_name="Client City"
+    )
+    client_region = models.ForeignKey(
+        Configurations_Models.Region,
+        on_delete=models.CASCADE,
+        verbose_name="Client Region",
+    )
+    client_address = models.CharField(max_length=750, verbose_name="Client Address 1")
+    client_building_no = models.CharField(
+        max_length=350, verbose_name="Client Building No", null=True, blank=True
+    )
+    client_apartment_no = models.CharField(
+        max_length=350, verbose_name="Client Apartment No", null=True, blank=True
+    )
+    client_address_landmark = models.CharField(
+        max_length=350, verbose_name="Client Address Landmark", null=True, blank=True
+    )
     added_at = models.DateTimeField(auto_now_add=True, verbose_name="Added at")
 
     class Meta:
@@ -50,23 +64,35 @@ class ClientDevice(models.Model):
     device_feeding_source = models.CharField(
         max_length=350, verbose_name="Device Feeding Source"
     )
-    purchasing_date = models.DateField(verbose_name="Purchasing Date")
-    installation_date = models.DateField(verbose_name="Installation Date")
-    warranty_start_date = models.DateField(verbose_name="Warranty Start Date")
-    related_branch = models.ForeignKey(
-        Configurations_Models.Branch,
-        on_delete=models.CASCADE,
-        verbose_name="Related Branch",
+    manufacturing_date = models.DateField(
+        verbose_name="Manufacturing Date", null=True, blank=True
     )
-    related_distributor = models.ForeignKey(
-        Configurations_Models.Distributor,
-        on_delete=models.CASCADE,
-        verbose_name="Related Distributor",
+    purchasing_date = models.DateField(
+        verbose_name="Purchasing Date", null=True, blank=True
     )
-    device_invoice = models.FileField(
-        upload_to="Client_Devices_Invoices", verbose_name="Device Invoice"
+    installation_date = models.DateField(
+        verbose_name="Installation Date", null=True, blank=True
     )
-    in_warranty = models.BooleanField(default=True, verbose_name="In Warranty")
+    expected_warranty_start_date = models.DateField(
+        verbose_name="Expected Warranty Start Date", null=True, blank=True
+    )
+    warranty_start_date = models.DateField(
+        verbose_name="Warranty Start Date", null=True, blank=True
+    )
+    related_branch = models.CharField(
+        max_length=350, verbose_name="Related Branch", null=True, blank=True
+    )
+    related_distributor = models.CharField(
+        max_length=350, verbose_name="Related Distributor", null=True, blank=True
+    )
+    device_invoice_or_manufacturer_label = models.FileField(
+        upload_to="Client_Devices_Invoices_Manufacturer_Labels",
+        verbose_name="Device Attachment",
+    )
+    in_warranty = models.BooleanField(verbose_name="In Warranty", null=True, blank=True)
+    installed_through_the_company = models.BooleanField(
+        verbose_name="Installed Through The Company", null=True, blank=True
+    )
 
     class Meta:
         verbose_name = "Client Device"

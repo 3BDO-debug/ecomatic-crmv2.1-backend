@@ -1,6 +1,8 @@
 from django.db import models
+from Accounts import models as Accounts_Models
+from Storage import models as Storage_Models
 
-# Create your models here.
+
 class Brand(models.Model):
     brand_name = models.CharField(max_length=350, verbose_name="Brand Name")
     added_at = models.DateTimeField(auto_now_add=True)
@@ -92,6 +94,18 @@ class TicketStatus(models.Model):
         verbose_name_plural = "Tickets Status"
 
 
+class TicketService(models.Model):
+    service_name = models.CharField(max_length=350, verbose_name="Service Name")
+    service_price = models.FloatField(verbose_name="Service Price")
+
+    class Meta:
+        verbose_name = "Ticket Service"
+        verbose_name_plural = "Ticket Services"
+
+    def __str__(self):
+        return self.service_name
+
+
 class CommonDiagnostics(models.Model):
     related_category = models.ForeignKey(
         Category, on_delete=models.CASCADE, verbose_name="Related Category"
@@ -117,3 +131,44 @@ class ClientCategory(models.Model):
 
     def __str__(self):
         return self.client_category
+
+
+class TechnicianAssignedCustody(models.Model):
+    related_technician = models.ForeignKey(
+        Accounts_Models.User, on_delete=models.CASCADE, verbose_name="User"
+    )
+    assigned_custodies = models.ManyToManyField(
+        Storage_Models.Custody, verbose_name="Assign Custodies"
+    )
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Created At")
+
+    class Meta:
+        verbose_name = "Technician Assigned Custody"
+        verbose_name_plural = "Technicians Assigned Custodies"
+
+    def __str__(self):
+        return f"Custody Assigned To {self.related_technician.first_name} {self.related_technician.last_name}"
+
+
+class City(models.Model):
+    city_name = models.CharField(max_length=350, verbose_name="City Name")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "City"
+        verbose_name_plural = "Cities"
+
+    def __str__(self):
+        return self.city_name
+
+
+class Region(models.Model):
+    region_name = models.CharField(max_length=350, verbose_name="Region Name")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Created At")
+
+    class Meta:
+        verbose_name = "Region"
+        verbose_name_plural = "Regions"
+
+    def __str__(self):
+        return self.region_name

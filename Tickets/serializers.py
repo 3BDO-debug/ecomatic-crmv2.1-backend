@@ -13,8 +13,8 @@ class TicketSerializers(serializers.ModelSerializer):
         rep["client_phone_number_1"] = instance.related_client.client_phone_number_1
         rep["client_phone_number_2"] = instance.related_client.client_phone_number_2
         rep["client_landline_number"] = instance.related_client.client_landline_number
-        rep["client_address_1"] = instance.related_client.client_address_1
-        rep["client_address_2"] = instance.related_client.client_address_2
+        rep["client_address"] = instance.related_client.client_address
+
         rep["technician_name"] = (
             f"{instance.related_technician.first_name} {instance.related_technician.last_name}"
             if instance.related_technician
@@ -35,9 +35,7 @@ class TicketDeviceSerializers(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         rep = super(TicketDeviceSerializers, self).to_representation(instance)
-        rep[
-            "device_name"
-        ] = instance.related_client_device.related_storage_item.item_name
+
         rep[
             "device_model_number"
         ] = instance.related_client_device.related_storage_item.item_model_number
@@ -48,7 +46,20 @@ class TicketDeviceSerializers(serializers.ModelSerializer):
         rep[
             "device_feeding_source"
         ] = instance.related_client_device.device_feeding_source
-
+        rep["manufacturing_date"] = instance.related_client_device.manufacturing_date
+        rep["purchasing_date"] = instance.related_client_device.purchasing_date
+        rep["installation_date"] = instance.related_client_device.installation_date
+        rep[
+            "expected_warranty_start_date"
+        ] = instance.related_client_device.expected_warranty_start_date
+        rep["warranty_start_date"] = instance.related_client_device.warranty_start_date
+        rep["in_warranty"] = instance.related_client_device.in_warranty
+        rep[
+            "installed_through_the_company"
+        ] = instance.related_client_device.installed_through_the_company
+        rep[
+            "device_invoice_or_manufacturer_label"
+        ] = instance.related_client_device.device_invoice_or_manufacturer_label.name
         return rep
 
 
@@ -58,7 +69,14 @@ class TicketDeviceSparepartsSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class TicketUpdateSerializers(serializers.ModelSerializer):
+class TicketDeviceServicepartsSerializer(serializers.ModelSerializer):
     class Meta:
-        model = models.TicketUpdate
+        model = models.TicketDeviceService
+        fields = "__all__"
+
+
+class TicketFollowbackCallRatingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.TicketFollowbackCallRating
+
         fields = "__all__"

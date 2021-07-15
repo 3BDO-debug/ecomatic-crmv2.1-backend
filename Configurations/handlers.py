@@ -1,6 +1,7 @@
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from . import models, serializers
+from Accounts import models as Accounts_Models
 
 
 @api_view(["GET"])
@@ -48,9 +49,24 @@ def ticket_status_handler(request):
 
 
 @api_view(["GET"])
+def ticket_services_handler(request):
+    ticket_services = models.TicketService.objects.all()
+    ticket_services_serializer = serializers.TicketServiceSerializer(
+        ticket_services, many=True
+    )
+    return Response(data=ticket_services_serializer.data)
+
+
+@api_view(["GET"])
 def common_diagnostics_handler(request, category_name):
-    common_diagnostics = models.CommonDiagnostics.objects.filter(
-        related_category=models.Category.objects.get(category_name=category_name)
+    common_diagnostics = (
+        models.CommonDiagnostics.objects.filter(
+            related_category=models.Category.objects.get(category_name=category_name)
+        )
+        if models.CommonDiagnostics.objects.filter(
+            related_category=models.Category.objects.get(category_name=category_name)
+        ).exists()
+        else models.CommonDiagnostics.objects.all()
     )
     common_diagnostics_serializer = serializers.CommonDiagnosticSerializer(
         common_diagnostics, many=True
@@ -65,3 +81,33 @@ def clients_categories_handler(request):
         clients_categories, many=True
     )
     return Response(data=clients_categories_serializer.data)
+
+
+@api_view(["GET"])
+def technicain_assigned_custodies_handler(request, technicain_id):
+    if models.TechnicianAssignedCustody.objects.filter(
+        related_technician=Accounts_Models.User.objects.get(id=technicain_id)
+    ).exists():
+        technician_assigned_custody = models.TechnicianAssignedCustody.objects.get(
+            related_technician=Accounts_Models.User.objects.get(id=technicain_id)
+        )
+        technicain_assigned_custody_serializer = (
+            serializers.TechnicianAssignedCustodySerializer(
+                technician_assigned_custody, many=False
+            )
+        )
+        return Response(data=technicain_assigned_custody_serializer.data)
+
+
+@api_view(["GET"])
+def cities_handler(request):
+    cities = models.City.objects.all()
+    cities_serializer = serializers.CitySerializer(cities, many=True)
+    return Response(data=cities_serializer.data)
+
+
+@api_view(["GET"])
+def regions_handler(request):
+    regions = models.Region.objects.all()
+    regions_serializer = serializers.RegionSerializer(regions, many=True)
+    return Response(data=regions_serializer.data)

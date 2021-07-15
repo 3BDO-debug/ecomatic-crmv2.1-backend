@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from Accounts import models as Accounts_Models
 from ast import literal_eval
+from Storage import models as Storage_Models
 
 
 @api_view(["GET", "POST", "DELETE"])
@@ -49,13 +50,13 @@ def items_handler(request):
             related_warehouse=models.Warehouse.objects.get(
                 id=int(request.data.get("relatedWarehouse"))
             ),
-            item_name=request.data.get("itemName"),
             brand=request.data.get("brand"),
             category=request.data.get("category"),
             item_model_number=request.data.get("itemModelNumber"),
             item_img=request.data.get("itemImg"),
             main_dimension=request.data.get("mainDimension"),
             cut_off_dimension=request.data.get("cutoffDimension"),
+            warranty_coverage=int(request.data.get("warrantyCoverage")),
         )
         items_serializer = serializers.ItemSerializers(created_item, many=False)
         created_item.save()
@@ -83,7 +84,6 @@ def spare_parts_handler(request):
             related_warehouse=models.Warehouse.objects.get(
                 id=int(request.data.get("relatedWarehouse"))
             ),
-            spare_part_name=request.data.get("sparePartName"),
             spare_part_model_number=request.data.get("sparePartModelNumber"),
             spare_part_img=request.data.get("sparePartImage"),
             spare_part_price=float(request.data.get("sparePartPrice")),
@@ -104,17 +104,39 @@ def spare_parts_handler(request):
         return Response(status=status.HTTP_200_OK, data=spareparts_serializer.data)
 
 
-@api_view(["GET"])
-def custody_handler(request):
-    custody = models.Custody.objects.all()
-    custody_serializer = serializers.CustodySerializers(custody, many=True)
-    return Response(custody_serializer.data)
+@api_view(["GET", "POST", "DELETE"])
+def custodies_handler(request):
+    if request.method == "POST":
+        models.Custody.objects.create(
+            custody_name=request.data.get("custodyName")
+        ).save()
+    elif request.method == "DELETE":
+        models.Custody.objects.filter(
+            id__in=literal_eval(request.data.get("custodiesToBeDeleted"))
+        ).delete()
+    custodies = models.Custody.objects.all().order_by("-created_at")
+    custodies_serializer = serializers.CustodySerializer(custodies, many=True)
+    return Response(status=status.HTTP_200_OK, data=custodies_serializer.data)
 
 
-@api_view(["GET"])
-def technitian_custody_handler(request):
-    technitian_custody = models.TechnicianCustody.objects.all()
-    technitian_custody_serializer = serializers.TechnicianCustodySerializers(
-        technitian_custody, many=True
+@api_view(["GET", "POST", "DELETE"])
+def custody_details_handler(request, custody_id):
+    custody = models.Custody.objects.get(id=custody_id)
+    if request.method == "POST":
+        models.CustodySparepart.objects.create(
+            related_custody=custody,
+            assigned_sparepart=Storage_Models.SparePart.objects.get(
+                id=int(request.data.get("assignedSparepartId"))
+            ),
+            assigned_qty=int(request.data.get("assignedQty")),
+        ).save()
+    elif request.method == "DELETE":
+        models.CustodySparepart.objects.filter(
+            id__in=literal_eval(request.data.get("custodySparepartsTobeDeleted"))
+        ).delete()
+
+    custody_spareparts = models.CustodySparepart.objects.filter(related_custody=custody)
+    custody_spareparts_serializer = serializers.CustodySparepartSerializer(
+        custody_spareparts, many=True
     )
-    return Response(technitian_custody_serializer.data)
+    return Response(status=status.HTTP_200_OK, data=custody_spareparts_serializer.data)

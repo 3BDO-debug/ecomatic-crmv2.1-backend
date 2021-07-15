@@ -1,6 +1,5 @@
 from django.db import models
-
-
+from Storage import models as Storage_Models
 from Accounts import models as Accounts_Models
 
 # Create your models here.
@@ -19,16 +18,13 @@ class Warehouse(models.Model):
         return f"{self.warehouse_name} assigned to {self.assigned_to.first_name}"
 
 
-
-
-
 class Item(models.Model):
     related_warehouse = models.ForeignKey(
         Warehouse, on_delete=models.CASCADE, verbose_name="Related Warehouse"
     )
     brand = models.CharField(max_length=350, verbose_name="Brand")
     category = models.CharField(max_length=350, verbose_name="Category")
-    item_name = models.CharField(max_length=750, verbose_name="Item Name")
+
     item_model_number = models.CharField(
         max_length=350, verbose_name="Item Model Number"
     )
@@ -37,6 +33,7 @@ class Item(models.Model):
     cut_off_dimension = models.CharField(
         max_length=350, verbose_name="Cutt off Dimension"
     )
+    warranty_coverage = models.IntegerField(verbose_name="Warranty Coverage")
     added_at = models.DateTimeField(auto_now_add=True, verbose_name="Added at")
 
     class Meta:
@@ -44,14 +41,14 @@ class Item(models.Model):
         verbose_name_plural = "Items"
 
     def __str__(self):
-        return self.item_name
+        return self.item_model_number
 
 
 class SparePart(models.Model):
     related_warehouse = models.ForeignKey(
         Warehouse, on_delete=models.CASCADE, verbose_name="Related Warehouse"
     )
-    spare_part_name = models.CharField(max_length=350, verbose_name="Spare Part Name")
+
     spare_part_model_number = models.CharField(
         max_length=350, verbose_name="Spare Part Model"
     )
@@ -67,13 +64,12 @@ class SparePart(models.Model):
         verbose_name_plural = "Spare Parts"
 
     def __str__(self):
-        return self.spare_part_name
+        return self.spare_part_model_number
 
 
 class Custody(models.Model):
     custody_name = models.CharField(max_length=350, verbose_name="Custody Name")
-    related_spare_parts = models.ManyToManyField(SparePart)
-    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Created At")
+    created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         verbose_name = "Custody"
@@ -83,20 +79,23 @@ class Custody(models.Model):
         return self.custody_name
 
 
-class TechnicianCustody(models.Model):
-    related_technician = models.ForeignKey(
-        Accounts_Models.User,
+class CustodySparepart(models.Model):
+    related_custody = models.ForeignKey(
+        Custody, on_delete=models.CASCADE, verbose_name="Related Custody"
+    )
+    assigned_sparepart = models.ForeignKey(
+        Storage_Models.SparePart,
         on_delete=models.CASCADE,
-        verbose_name="Related Technician",
+        verbose_name="Assigned Sparepart",
+        null=True,
+        blank=True,
     )
-    assigned_custodies = models.ManyToManyField(
-        Custody, verbose_name="Assigned Custodies"
-    )
-    created_at = models.DateTimeField(auto_now_add=True)
+    assigned_qty = models.IntegerField(verbose_name="Assigned Qty")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Created At")
 
     class Meta:
-        verbose_name = "Technician Custody"
-        verbose_name_plural = "Technician Custodies"
+        verbose_name = "Custody Sparepart"
+        verbose_name_plural = "Custodies Spareparts"
 
     def __str__(self):
-        return f"{self.related_technician.first_name}'s Custodies"
+        return f"New Custody Sparepart for {self.related_custody.custody_name}"

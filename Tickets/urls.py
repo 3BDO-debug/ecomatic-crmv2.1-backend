@@ -10,5 +10,13 @@ urlpatterns = [
         "Ticket-Device-Spareparts/<int:ticket_device_id>",
         handlers.ticket_device_spareparts_handler,
     ),
+    path(
+        "Ticket-Device-Services/<int:ticket_device_id>",
+        handlers.ticket_device_services_handler,
+    ),
     path("ticket_updates", handlers.ticket_updates_handler),
+    path(
+        "Ticket-Followback-Call-Rating/<int:ticket_id>",
+        handlers.ticket_followback_call_rating_handler,
+    ),
 ]

@@ -13,9 +13,6 @@ class WarehouseSerializers(serializers.ModelSerializer):
         return rep
 
 
-
-
-
 class ItemSerializers(serializers.ModelSerializer):
     class Meta:
         model = models.Item
@@ -28,13 +25,24 @@ class SparePartSerializers(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class CustodySerializers(serializers.ModelSerializer):
+class CustodySerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Custody
         fields = "__all__"
 
 
-class TechnicianCustodySerializers(serializers.ModelSerializer):
+class CustodySparepartSerializer(serializers.ModelSerializer):
     class Meta:
-        model = models.TechnicianCustody
+        model = models.CustodySparepart
         fields = "__all__"
+
+    def to_representation(self, instance):
+        rep = super(CustodySparepartSerializer, self).to_representation(instance)
+        rep["related_custody_name"] = instance.related_custody.custody_name
+        rep["assigned_sparepart_name"] = instance.assigned_sparepart.spare_part_name
+        rep[
+            "assigned_sparepart_model_number"
+        ] = instance.assigned_sparepart.spare_part_model_number
+        rep["assigned_sparepart_img"] = instance.assigned_sparepart.spare_part_img.name
+
+        return rep

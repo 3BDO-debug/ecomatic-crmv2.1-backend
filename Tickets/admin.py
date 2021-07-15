@@ -5,4 +5,5 @@ from . import models
 admin.site.register(models.Ticket)
 admin.site.register(models.TicketDevice)
 admin.site.register(models.TicketDeviceSpareparts)
-admin.site.register(models.TicketUpdate)
+admin.site.register(models.TicketDeviceService)
+admin.site.register(models.TicketFollowbackCallRating)

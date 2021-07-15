@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from . import models
+from Storage import serializers as Storage_Serializers
 
 
 class BrandSerializer(serializers.ModelSerializer):
@@ -43,6 +44,12 @@ class TicketStatusSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+class TicketServiceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.TicketService
+        fields = "__all__"
+
+
 class CommonDiagnosticSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.CommonDiagnostics
@@ -52,4 +59,26 @@ class CommonDiagnosticSerializer(serializers.ModelSerializer):
 class ClientCategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = models.ClientCategory
+        fields = "__all__"
+
+
+class TechnicianAssignedCustodySerializer(serializers.ModelSerializer):
+    assigned_custodies = Storage_Serializers.CustodySerializer(
+        read_only=True, many=True
+    )
+
+    class Meta:
+        model = models.TechnicianAssignedCustody
+        fields = ("assigned_custodies", "created_at")
+
+
+class CitySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.City
+        fields = "__all__"
+
+
+class RegionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Region
         fields = "__all__"
