@@ -93,6 +93,9 @@ class TicketStatus(models.Model):
         verbose_name = "Ticket Status"
         verbose_name_plural = "Tickets Status"
 
+    def __str__(self):
+        return self.ticket_status
+
 
 class TicketService(models.Model):
     service_name = models.CharField(max_length=350, verbose_name="Service Name")

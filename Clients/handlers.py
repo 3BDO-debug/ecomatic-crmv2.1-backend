@@ -32,18 +32,19 @@ def client_device_warranty_status_checker(request):
 @api_view(["POST"])
 def client_lookup_handler(request):
 
-    if models.Client.objects.filter(
-        client_phone_number_1=request.data.get("clientPhoneNumber1")
-    ).exists():
+    if (
+        models.Client.objects.filter(
+            client_phone_number_1=request.data.get("clientPhoneNumberOrLandline")
+        ).exists()
+        or models.Client.objects.filter(
+            client_phone_number_2=request.data.get("clientPhoneNumberOrLandline")
+        ).exists()
+        or models.Client.objects.filter(
+            client_landline_number=request.data.get("clientPhoneNumberOrLandline")
+        ).exists()
+    ):
         return Response({"client_exist": True})
-    elif models.Client.objects.filter(
-        client_phone_number_2=request.data.get("clientPhoneNumber2")
-    ).exists():
-        return Response({"client_exist": True})
-    elif models.Client.objects.filter(
-        client_landline_number=request.data.get("clientLandlineNumber")
-    ).exists():
-        return Response({"client_exist": True})
+
     else:
         return Response({"client_exist": False})
 
