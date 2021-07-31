@@ -141,6 +141,8 @@ def ticket_devices_handler(request, ticket_id):
 @api_view(["GET", "POST", "DELETE"])
 def ticket_device_spareparts_handler(request, ticket_device_id):
     ticket_device = models.TicketDevice.objects.get(id=ticket_device_id)
+    ticket = models.Ticket.objects.get(id=ticket_device.related_ticket.id)
+
     ticket_device_spareparts = models.TicketDeviceSpareparts.objects.filter(
         related_ticket_device=ticket_device
     )
@@ -159,6 +161,10 @@ def ticket_device_spareparts_handler(request, ticket_device_id):
             assigned_sparepart=assigned_sparepart,
             required_qty=int(request.data.get("requiredQty")),
         ).save()
+        print("hereee", type(float(request.data.get("requiredQty"))))
+        ticket.total_cost += (
+            float(request.data.get("requiredQty")) * assigned_sparepart.spare_part_price
+        )
         assigned_sparepart.available_qty -= int(request.data.get("requiredQty"))
         assigned_sparepart.save()
         return Response(
@@ -181,6 +187,7 @@ def ticket_device_spareparts_handler(request, ticket_device_id):
 @api_view(["GET", "POST", "DELETE"])
 def ticket_device_services_handler(request, ticket_device_id):
     ticket_device = models.TicketDevice.objects.get(id=ticket_device_id)
+    ticket = models.Ticket.objects.get(id=ticket_device.related_ticket.id)
     ticket_device_services = models.TicketDeviceService.objects.filter(
         related_ticket_device=ticket_device
     )
@@ -201,7 +208,10 @@ def ticket_device_services_handler(request, ticket_device_id):
             assigned_service=assigned_service,
             required_qty=int(request.data.get("requiredQty")),
         ).save()
-
+        ticket.total_cost += (
+            int(request.data.get("requiredQty")) * assigned_service.service_price
+        )
+        ticket.save()
         return Response(
             status=status.HTTP_201_CREATED, data=ticket_device_service_serializer.data
         )

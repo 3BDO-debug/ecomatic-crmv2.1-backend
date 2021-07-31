@@ -31,20 +31,27 @@ def client_device_warranty_status_checker(request):
 
 @api_view(["POST"])
 def client_lookup_handler(request):
-
-    if (
-        models.Client.objects.filter(
+    if models.Client.objects.filter(
+        client_phone_number_1=request.data.get("clientPhoneNumberOrLandline")
+    ).exists():
+        client = models.Client.objects.filter(
             client_phone_number_1=request.data.get("clientPhoneNumberOrLandline")
-        ).exists()
-        or models.Client.objects.filter(
+        )
+        return Response({"client_exist": True, "client_id": client.first().id})
+    elif models.Client.objects.filter(
+        client_phone_number_2=request.data.get("clientPhoneNumberOrLandline")
+    ).exists():
+        client = models.Client.objects.filter(
             client_phone_number_2=request.data.get("clientPhoneNumberOrLandline")
-        ).exists()
-        or models.Client.objects.filter(
+        )
+        return Response({"client_exist": True, "client_id": client.first().id})
+    elif models.Client.objects.filter(
+        client_landline_number=request.data.get("clientPhoneNumberOrLandline")
+    ).exists():
+        client = models.Client.objects.filter(
             client_landline_number=request.data.get("clientPhoneNumberOrLandline")
-        ).exists()
-    ):
-        return Response({"client_exist": True})
-
+        )
+        return Response({"client_exist": True, "client_id": client.first().id})
     else:
         return Response({"client_exist": False})
 
@@ -74,6 +81,7 @@ def clients_handler(request):
             ),
             client_address=request.data.get("clientAddress"),
             client_building_no=request.data.get("clientBuildingNo"),
+            client_floor_no=request.data.get("clientFloorNo"),
             client_apartment_no=request.data.get("clientApartmentNo"),
             client_address_landmark=request.data.get("landmark"),
         )
@@ -105,8 +113,15 @@ def client_details_handler(request, client_id):
         client.client_phone_number_1 = request.data.get("client_phone_number_1")
         client.client_phone_number_2 = request.data.get("client_phone_number_2")
         client.client_landline_number = request.data.get("client_landline_number")
-        client.client_city = request.data.get("client_city")
-        client.client_region = request.data.get("client_region")
+        client.client_city = Configurations_Models.City.objects.get(
+            id=int(request.data.get("client_city"))
+        )
+        client.client_region = Configurations_Models.Region.objects.get(
+            id=int(request.data.get("client_region"))
+        )
+        client.client_building_no = request.data.get("client_building_no")
+        client.client_floor_no = request.data.get("client_floor_no")
+        client.client_apartment_no = request.data.get("client_apartment_no")
         client.client_address = request.data.get("client_address")
         client.save()
         return Response(data=request.data, status=status.HTTP_200_OK)

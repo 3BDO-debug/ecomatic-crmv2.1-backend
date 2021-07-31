@@ -23,6 +23,7 @@ class Ticket(models.Model):
         blank=True,
     )
     current_stage = models.CharField(max_length=350, verbose_name="Current Stage")
+    total_cost = models.FloatField(verbose_name="Total Cost", default=0.00)
     closed_by = models.CharField(
         max_length=350, verbose_name="Closed By", null=True, blank=True
     )
@@ -98,7 +99,7 @@ class TicketDeviceSpareparts(models.Model):
         verbose_name_plural = "Tickets Devices Spareparts"
 
     def __str__(self):
-        return f"New Spareparts assigned for {self.related_ticket_device.related_client_device.related_storage_item.item_name}"
+        return f"New Spareparts assigned for {self.related_ticket_device.related_client_device.related_storage_item.item_model_number}"
 
 
 class TicketDeviceService(models.Model):

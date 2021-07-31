@@ -68,11 +68,28 @@ class TicketDeviceSparepartsSerializer(serializers.ModelSerializer):
         model = models.TicketDeviceSpareparts
         fields = "__all__"
 
+    def to_representation(self, instance):
+        rep = super(TicketDeviceSparepartsSerializer, self).to_representation(instance)
+        rep[
+            "spare_part_model_number"
+        ] = instance.assigned_sparepart.spare_part_model_number
+        rep["spare_part_price"] = instance.assigned_sparepart.spare_part_price
+        return rep
+
 
 class TicketDeviceServicepartsSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.TicketDeviceService
         fields = "__all__"
+
+    def to_representation(self, instance):
+        rep = super(TicketDeviceServicepartsSerializer, self).to_representation(
+            instance
+        )
+        rep["service_name"] = instance.assigned_service.service_name
+        rep["service_price"] = instance.assigned_service.service_price
+
+        return rep
 
 
 class TicketFollowbackCallRatingSerializer(serializers.ModelSerializer):

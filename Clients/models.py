@@ -33,6 +33,9 @@ class Client(models.Model):
     client_building_no = models.CharField(
         max_length=350, verbose_name="Client Building No", null=True, blank=True
     )
+    client_floor_no = models.CharField(
+        max_length=350, verbose_name="Client Floor No", blank=True, null=True
+    )
     client_apartment_no = models.CharField(
         max_length=350, verbose_name="Client Apartment No", null=True, blank=True
     )
