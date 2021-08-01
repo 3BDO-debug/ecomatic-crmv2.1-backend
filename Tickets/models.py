@@ -121,7 +121,7 @@ class TicketDeviceService(models.Model):
         verbose_name_plural = "Tickets Devices Services"
 
     def __str__(self):
-        return f"New Services assigned for {self.related_ticket_device.related_client_device.related_storage_item.item_name}"
+        return f"New Services assigned for {self.related_ticket_device.related_client_device.related_storage_item.item_model_number}"
 
 
 class TicketFollowbackCallRating(models.Model):
