@@ -97,3 +97,39 @@ class TicketFollowbackCallRatingSerializer(serializers.ModelSerializer):
         model = models.TicketFollowbackCallRating
 
         fields = "__all__"
+
+
+""" Ticket Completion Forms """
+
+
+class GasOvenInstallationRequirementsFormSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.GasOvenInstallationRequirementsForm
+        fields = "__all__"
+
+
+class ElectricOvenInstallationRequirementsFormSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.ElectricOvenInstallationRequirementsForm
+        fields = "__all__"
+
+
+class SlimHobInstallationRequirementsFormSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.SlimHobInstallationRequirementsForm
+        fields = "__all__"
+
+
+class CookerInstallationRequirementsFormSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.CookerInstallationRequirementsForm
+        fields = "__all__"
+
+
+class HoodInstallationRequirementsFormSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.HoodInstallationRequirementsForm
+        fields = "__all__"
+
+
+""" End Ticket Completeion Forms """

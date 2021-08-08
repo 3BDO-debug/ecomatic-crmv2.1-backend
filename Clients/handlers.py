@@ -17,6 +17,21 @@ from ast import literal_eval
 
 
 @api_view(["POST"])
+def expected_warranty_start_date_calc(request):
+    if bool(request.data.get("invoiceAvailabe")):
+        expected_warranty_start_date = (
+            datetime.datetime.strptime(request.data.get("date"), "%Y-%m-%d")
+            + relativedelta(months=2)
+        ).date()
+    else:
+        expected_warranty_start_date = (
+            datetime.datetime.strptime(request.data.get("date"), "%Y-%m-%d")
+            + relativedelta(months=3)
+        ).date()
+    return Response({"expected_warranty_start_date": expected_warranty_start_date})
+
+
+@api_view(["POST"])
 def client_device_warranty_status_checker(request):
     installation_date = request.data.get("installationDate")
     warranty_expiry_date = (

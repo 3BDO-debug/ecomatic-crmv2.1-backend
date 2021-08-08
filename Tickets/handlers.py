@@ -292,3 +292,218 @@ def ticket_followback_call_rating_handler(request, ticket_id):
             )
         )
         return Response(data=ticket_followback_call_rating_serializer.data)
+
+
+""" Ticket Completion Forms """
+
+
+@api_view(["GET", "POST"])
+def gas_oven_installation_requirements_form_handler(request, ticket_device_id):
+    related_ticket_device = models.TicketDevice.objects.get(id=ticket_device_id)
+    if request.method == "POST":
+        models.GasOvenInstallationRequirementsForm.objects.create(
+            related_ticket=related_ticket_device.related_ticket,
+            related_ticket_device=related_ticket_device,
+            gas_oven_model_number=request.data.get("gasOvenModelNumber"),
+            gas_type=request.data.get("gasType"),
+            gas_pressure=request.data.get("gasPressure"),
+            ventillation_opening_below_oven_is_available=bool(
+                request.data.get("ventillationOpeningBelowOvenIsAvailable")
+            ),
+            ventillation_opening_below_oven_measurements=request.data.get(
+                "ventillationOpeningBelowOvenMeasurements"
+            ),
+            ventillation_opening_in_front_of_oven_is_available=bool(
+                request.data.get("ventillationOpeningInFrontOfOvenIsAvailable")
+            ),
+            ventillation_opening_in_front_of_oven_measurements=request.data.get(
+                "ventillationOpeningInFrontOfOvenMeasurements"
+            ),
+            stabilizer_type=request.data.get("stabilizerType"),
+            gas_oven_fonia_number=request.data.get("gasOvenFoniaNumber"),
+            grill_fonia_number=request.data.get("grillFoniaNumber"),
+            whats_done_by_the_technician=request.data.get("whatsDoneByTechnician"),
+            gas_oven_final_condition=request.data.get("gasOvenFinalCondition"),
+            notes=request.data.get("notes"),
+            client_signature=request.data.get("clientSignature"),
+            technician_name=request.data.get("technicianName"),
+        ).save()
+        return Response(status=status.HTTP_201_CREATED)
+    elif request.method == "GET":
+        gas_oven_installation_requirements_form = (
+            models.GasOvenInstallationRequirementsForm.objects.get(
+                related_ticket=related_ticket_device.related_ticket,
+                related_ticket_device=related_ticket_device,
+            )
+        )
+        gas_oven_installation_requirements_form_serializer = (
+            serializers.GasOvenInstallationRequirementsFormSerializer(
+                gas_oven_installation_requirements_form, many=False
+            )
+        )
+        return Response(
+            data=gas_oven_installation_requirements_form_serializer.data,
+            status=status.HTTP_200_OK,
+        )
+
+
+@api_view(["GET", "POST"])
+def electric_oven_installation_requirements_form_handler(request, ticket_device_id):
+    related_ticket_device = models.TicketDevice.objects.get(id=ticket_device_id)
+    if request.method == "POST":
+        models.ElectricOvenInstallationRequirementsForm.objects.create(
+            related_ticket=related_ticket_device.related_ticket,
+            related_ticket_device=related_ticket_device,
+            electric_oven_model_number=request.data.get("electricOvenModelNumber"),
+            ventillation_opening_is_available=bool(
+                request.data.get("ventaillationOpeningIsAvailable")
+            ),
+            ventillation_opening_measurements=request.data.get(
+                "ventiallationOpeningMeasurements"
+            ),
+            notes=request.data.get("notes"),
+            whats_done_by_the_technician=request.data.get("whatsDoneByTechnician"),
+            electric_oven_final_condition=request.data.get(
+                "electricOvenFinalCondition"
+            ),
+            client_signature=request.data.get("clientSignature"),
+            technician_name=request.data.get("technicianName"),
+        ).save()
+        return Response(status=status.HTTP_201_CREATED)
+    elif request.method == "GET":
+        electric_oven_installation_requirements_form = (
+            models.ElectricOvenInstallationRequirementsForm.objects.get(
+                related_ticket=related_ticket_device.related_ticket,
+                related_ticket_device=related_ticket_device,
+            )
+        )
+        electric_oven_installation_requirements_form_serializer = (
+            serializers.ElectricOvenInstallationRequirementsFormSerializer(
+                electric_oven_installation_requirements_form, many=False
+            )
+        )
+        return Response(
+            data=electric_oven_installation_requirements_form_serializer.data,
+            status=status.HTTP_200_OK,
+        )
+
+
+@api_view(["GET", "POST"])
+def slim_hob_installation_requirements_form_handler(request, ticket_device_id):
+    related_ticket_device = models.TicketDevice.objects.get(id=ticket_device_id)
+
+    if request.method == "POST":
+
+        models.SlimHobInstallationRequirementsForm.objects.create(
+            related_ticket=related_ticket_device.related_ticket,
+            related_ticket_device=related_ticket_device,
+            slim_hob_model_number=request.data.get("slimHobModelNumber"),
+            gas_type=request.data.get("gasType"),
+            marble_opening_hole_is_available=bool(
+                request.data.get("marbleOpeningHoleIsAvailable")
+            ),
+            marble_opening_hole_measurements=request.data.get(
+                "marbleOpeningHoleMeasurements"
+            ),
+            gas_pressure=request.data.get("gasPressure"),
+            stabilizer_type=request.data.get("stabilizerType"),
+            whats_done_by_the_technician=request.data.get("whatsDoneByTechnician"),
+            slim_hob_final_condition=request.data.get("slimHobFinalCondition"),
+            client_signature=request.data.get("clientSignature"),
+            technician_name=request.data.get("technicianName"),
+            notes=request.data.get("notes"),
+        ).save()
+        return Response(status=status.HTTP_201_CREATED)
+    elif request.method == "GET":
+        slim_hob_installation_requirements_form = (
+            models.SlimHobInstallationRequirementsForm.objects.get(
+                related_ticket=related_ticket_device.related_ticket,
+                related_ticket_device=related_ticket_device,
+            )
+        )
+        slim_hob_installation_requirements_form_serializer = (
+            serializers.SlimHobInstallationRequirementsFormSerializer(
+                slim_hob_installation_requirements_form, many=False
+            )
+        )
+        return Response(
+            data=slim_hob_installation_requirements_form_serializer.data,
+            status=status.HTTP_200_OK,
+        )
+
+
+@api_view(["GET", "POST"])
+def cooker_installation_requirements_form_handler(request, ticket_device_id):
+    related_ticket_device = models.TicketDevice.objects.get(id=ticket_device_id)
+    if request.method == "POST":
+        models.CookerInstallationRequirementsForm.objects.create(
+            related_ticket=related_ticket_device.related_ticket,
+            related_ticket_device=related_ticket_device,
+            cooker_model_number=request.data.get("cookerModelNumber"),
+            gas_type=request.data.get("gasType"),
+            gas_pressure=request.data.get("gasPressure"),
+            notes=request.data.get("notes"),
+            stabilizer_type=request.data.get("stabilizerType"),
+            cooker_fonia_number=request.data.get("cookerFoniaNumber"),
+            grill_fonia_number=request.data.get("grillFoniaNumber"),
+            whats_done_by_the_technician=request.data.get("whatsDoneByTechnician"),
+            cooker_final_condition=request.data.get("cookerFinalCondition"),
+            client_signature=request.data.get("clientSignature"),
+            technician_name=request.data.get("technicianName"),
+        ).save()
+        return Response(status=status.HTTP_201_CREATED)
+    elif request.method == "GET":
+        cooker_installation_requirements_form = (
+            models.CookerInstallationRequirementsForm.objects.get(
+                related_ticket=related_ticket_device.related_ticket,
+                related_ticket_device=related_ticket_device,
+            )
+        )
+        cooker_installation_requirements_form_serializer = (
+            serializers.CookerInstallationRequirementsFormSerializer(
+                cooker_installation_requirements_form, many=False
+            )
+        )
+        return Response(
+            data=cooker_installation_requirements_form_serializer.data,
+            status=status.HTTP_200_OK,
+        )
+
+
+@api_view(["GET", "POST"])
+def hood_installation_requirements_form_handler(request, ticket_device_id):
+    related_ticket_device = models.TicketDevice.objects.get(id=ticket_device_id)
+    if request.method == "POST":
+        models.HoodInstallationRequirementsForm.objects.create(
+            related_ticket=related_ticket_device.related_ticket,
+            related_ticket_device=related_ticket_device,
+            hood_model_number=request.data.get("hoodModelNumber"),
+            hood_height=request.data.get("hoodHeight"),
+            hood_exhaust_height=request.data.get("hoodExhaustHeight"),
+            hood_exhaust_is_straight=bool(request.data.get("hoodExhaustIsStraight")),
+            notes=request.data.get("notes"),
+            whats_done_by_the_technician=request.data.get("whatsDoneByTechnician"),
+            hood_final_condition=request.data.get("hoodFinalCondition"),
+            client_signature=request.data.get("clientSignature"),
+            technician_name=request.data.get("technicianName"),
+        ).save()
+        return Response(status=status.HTTP_201_CREATED)
+    elif request.method == "GET":
+        hood_installation_requirements_form = (
+            models.HoodInstallationRequirementsForm.objects.get(
+                related_ticket=related_ticket_device.related_ticket,
+                related_ticket_device=related_ticket_device,
+            )
+        )
+        hood_installation_requirements_form_serializer = (
+            serializers.HoodInstallationRequirementsFormSerializer(
+                hood_installation_requirements_form, many=False
+            )
+        )
+        return Response(
+            data=hood_installation_requirements_form_serializer.data,
+            status=status.HTTP_200_OK,
+        )
+
+
+""" End Ticket Completeion Forms """

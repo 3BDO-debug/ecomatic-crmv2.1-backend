@@ -137,3 +137,183 @@ class TicketFollowbackCallRating(models.Model):
 
     def __str__(self):
         return f"Ticket rating for {self.related_ticket.id}"
+
+
+""" Ticket Completion Forms """
+
+
+class GasOvenInstallationRequirementsForm(models.Model):
+    related_ticket = models.ForeignKey(
+        Ticket, on_delete=models.CASCADE, null=True, blank=True
+    )
+    related_ticket_device = models.ForeignKey(
+        TicketDevice,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        verbose_name="Related Ticket Device",
+    )
+    gas_oven_model_number = models.CharField(
+        max_length=350,
+        verbose_name="Gas Oven Model Number",
+    )
+    gas_type = models.CharField(max_length=350, verbose_name="Gas Type")
+    gas_pressure = models.CharField(max_length=350, verbose_name="Gas Pressure")
+    ventillation_opening_below_oven_is_available = models.BooleanField(
+        default=True, verbose_name="Ventaillation Opening Below Oven Is Available"
+    )
+    ventillation_opening_below_oven_measurements = models.CharField(
+        max_length=350, verbose_name="Ventillation Opening Below Oven Measurements"
+    )
+    ventillation_opening_in_front_of_oven_is_available = models.BooleanField(
+        default=True, verbose_name="Ventaillaiton Opening In Front Of Oven Is Available"
+    )
+    ventillation_opening_in_front_of_oven_measurements = models.CharField(
+        max_length=350,
+        verbose_name="Ventaillaiton Opening In Front Of Oven Measurements",
+    )
+    stabilizer_type = models.CharField(max_length=350, verbose_name="Stabilizer Type")
+    gas_oven_fonia_number = models.CharField(
+        max_length=350, verbose_name="Gas Oven Fonia Number"
+    )
+    grill_fonia_number = models.CharField(
+        max_length=350, verbose_name="Grill Fonia Number"
+    )
+    whats_done_by_the_technician = models.TextField(
+        verbose_name="What's Done By The Technician"
+    )
+    gas_oven_final_condition = models.TextField(verbose_name="Gas Oven Final Condition")
+    client_signature = models.CharField(max_length=350, verbose_name="Client Signature")
+    technician_name = models.CharField(max_length=350, verbose_name="Technician Name")
+    notes = models.TextField(verbose_name="Notes")
+
+
+class ElectricOvenInstallationRequirementsForm(models.Model):
+    related_ticket = models.ForeignKey(
+        Ticket, on_delete=models.CASCADE, null=True, blank=True
+    )
+    related_ticket_device = models.ForeignKey(
+        TicketDevice,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        verbose_name="Related Ticket Device",
+    )
+    electric_oven_model_number = models.CharField(
+        max_length=350, verbose_name="Electricc Oven Model Number"
+    )
+    ventillation_opening_is_available = models.BooleanField(
+        default=True, verbose_name="Ventillation Opening Is Available"
+    )
+    ventillation_opening_measurements = models.CharField(
+        max_length=350, verbose_name="Ventillation Opening Measurements"
+    )
+    notes = models.TextField(verbose_name="Notes")
+    whats_done_by_the_technician = models.TextField(
+        verbose_name="What's Done By The Technician"
+    )
+    electric_oven_final_condition = models.TextField(
+        verbose_name="Electric Oven Final Condition"
+    )
+    client_signature = models.CharField(max_length=350, verbose_name="Client Signature")
+    technician_name = models.CharField(max_length=350, verbose_name="Technician Name")
+
+
+class SlimHobInstallationRequirementsForm(models.Model):
+    related_ticket = models.ForeignKey(
+        Ticket, on_delete=models.CASCADE, null=True, blank=True
+    )
+    related_ticket_device = models.ForeignKey(
+        TicketDevice,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        verbose_name="Related Ticket Device",
+    )
+    slim_hob_model_number = models.CharField(
+        max_length=350, verbose_name="Slim Hob Model Number"
+    )
+    gas_type = models.CharField(max_length=350, verbose_name="Gas Type")
+    marble_opening_hole_is_available = models.BooleanField(
+        default=True, verbose_name="Marble Opening Hole"
+    )
+    marble_opening_hole_measurements = models.CharField(
+        max_length=350, verbose_name="Marble Opening Hole Measurements"
+    )
+
+    gas_pressure = models.CharField(max_length=350, verbose_name="Gas Pressure")
+    stabilizer_type = models.CharField(max_length=350, verbose_name="Stabilizer Type")
+
+    whats_done_by_the_technician = models.TextField(
+        verbose_name="What's Done By The Technician"
+    )
+    slim_hob_final_condition = models.TextField(verbose_name="Slim Hob Final Condition")
+    client_signature = models.CharField(max_length=350, verbose_name="Client Signature")
+    technician_name = models.CharField(max_length=350, verbose_name="Technician Name")
+    notes = models.TextField(verbose_name="Notes")
+
+
+class CookerInstallationRequirementsForm(models.Model):
+    related_ticket = models.ForeignKey(
+        Ticket, on_delete=models.CASCADE, null=True, blank=True
+    )
+    related_ticket_device = models.ForeignKey(
+        TicketDevice,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        verbose_name="Related Ticket Device",
+    )
+    cooker_model_number = models.CharField(
+        max_length=350, verbose_name="Cooker Model Number"
+    )
+    gas_type = models.CharField(max_length=350, verbose_name="Gas Type")
+    gas_pressure = models.CharField(max_length=350, verbose_name="Gas Pressure")
+    notes = models.TextField(verbose_name="Notes")
+    stabilizer_type = models.CharField(max_length=350, verbose_name="Stabilizer Type")
+    cooker_fonia_number = models.CharField(
+        max_length=350, verbose_name="Cooker Fonia Number"
+    )
+    grill_fonia_number = models.CharField(
+        max_length=350, verbose_name="Grill Fonia Number"
+    )
+    whats_done_by_the_technician = models.TextField(
+        verbose_name="What's Done By The Technician"
+    )
+    cooker_final_condition = models.TextField(verbose_name="Cooker Final Condition")
+    client_signature = models.CharField(max_length=350, verbose_name="Client Signature")
+    technician_name = models.CharField(max_length=350, verbose_name="Technician Name")
+    notes = models.TextField(verbose_name="Notes")
+
+
+class HoodInstallationRequirementsForm(models.Model):
+    related_ticket = models.ForeignKey(
+        Ticket, on_delete=models.CASCADE, null=True, blank=True
+    )
+    related_ticket_device = models.ForeignKey(
+        TicketDevice,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        verbose_name="Related Ticket Device",
+    )
+    hood_model_number = models.CharField(
+        max_length=350, verbose_name="Hood Model Number"
+    )
+    hood_height = models.CharField(max_length=350, verbose_name="Hood Height")
+    hood_exhaust_height = models.CharField(
+        max_length=350, verbose_name="Hood Exhaust Height"
+    )
+    hood_exhaust_is_straight = models.BooleanField(
+        default=True, verbose_name="Hood Exhaust Is Straight"
+    )
+    notes = models.TextField(verbose_name="Notes")
+    whats_done_by_the_technician = models.TextField(
+        verbose_name="What's Done By The Technician"
+    )
+    hood_final_condition = models.TextField(verbose_name="Hood Final Condition")
+    client_signature = models.CharField(max_length=350, verbose_name="Client Signature")
+    technician_name = models.CharField(max_length=350, verbose_name="Technician Name")
+
+
+""" End Ticket Completetion Forms """
