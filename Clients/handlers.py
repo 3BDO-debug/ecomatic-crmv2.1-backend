@@ -147,7 +147,7 @@ def client_devices_handler(request, client_id):
     client = models.Client.objects.get(id=client_id)
 
     if request.method == "POST":
-
+        
         models.ClientDevice.objects.create(
             related_client=client,
             related_storage_item=Storage_Models.Item.objects.get(
