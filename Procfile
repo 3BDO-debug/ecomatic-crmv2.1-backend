@@ -1,0 +1,1 @@
+web: gunicorn Ecomatic_CRM.wsgi 
