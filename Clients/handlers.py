@@ -180,7 +180,7 @@ def client_devices_handler(request, client_id):
         client_devices, many=True
     )
 
-    return Response(client_devices_serializer.data)
+    return Response(status=status.HTTP_200_OK, data=client_devices_serializer.data)
 
 
 @api_view(["GET"])
