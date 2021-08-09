@@ -60,13 +60,13 @@ def ticket_details_handler(request, ticket_id):
                     datetime.date.today()
                     > related_client_device.purchasing_date + relativedelta(months=2)
                 ):
-                    related_client_device.instllation_date = datetime.date.today()
+                    related_client_device.installation_date = datetime.date.today()
 
                     related_client_device.warranty_start_date = (
                         related_client_device.purchasing_date + relativedelta(months=2)
                     )
                 else:
-                    related_client_device.instllation_date = datetime.date.today()
+                    related_client_device.installation_date = datetime.date.today()
                     related_client_device.warranty_start_date = datetime.date.today()
                 related_client_device.installed_through_the_company = True
                 related_client_device.in_warranty = (
@@ -161,26 +161,41 @@ def ticket_device_spareparts_handler(request, ticket_device_id):
             assigned_sparepart=assigned_sparepart,
             required_qty=int(request.data.get("requiredQty")),
         ).save()
-        print("hereee", type(float(request.data.get("requiredQty"))))
+
         ticket.total_cost += (
             float(request.data.get("requiredQty")) * assigned_sparepart.spare_part_price
         )
+        ticket.save()
+        ticket_serializer = serializers.TicketSerializers(ticket, many=False)
         assigned_sparepart.available_qty -= int(request.data.get("requiredQty"))
         assigned_sparepart.save()
         return Response(
             status=status.HTTP_201_CREATED,
-            data=ticket_device_spareparts_serializer.data,
+            data={
+                "ticket_device_spareparts": ticket_device_spareparts_serializer.data,
+                "ticket_details": ticket_serializer.data,
+            },
         )
     elif request.method == "DELETE":
-        models.TicketDeviceSpareparts.objects.filter(
+        sparepart_to_be_deleted = models.TicketDeviceSpareparts.objects.filter(
             assigned_sparepart=Storage_Models.SparePart.objects.get(
                 id=int(request.data.get("assignedSparepartId"))
             ),
             related_ticket_device=ticket_device,
-        ).delete()
+        ).first()
+        ticket.total_cost -= (
+            sparepart_to_be_deleted.required_qty
+            * sparepart_to_be_deleted.assigned_sparepart.spare_part_price
+        )
+        ticket.save()
+        ticket_serializer = serializers.TicketSerializers(ticket, many=False)
+        sparepart_to_be_deleted.delete()
         return Response(
-            status=status.HTTP_205_RESET_CONTENT,
-            data=ticket_device_spareparts_serializer.data,
+            status=status.HTTP_201_CREATED,
+            data={
+                "ticket_device_spareparts": ticket_device_spareparts_serializer.data,
+                "ticket_details": ticket_serializer.data,
+            },
         )
 
 
@@ -198,7 +213,6 @@ def ticket_device_services_handler(request, ticket_device_id):
 
         return Response(data=ticket_device_service_serializer.data)
     elif request.method == "POST":
-        print("hellldls", request.data.get("assignedServiceId"))
 
         assigned_service = Configurations_Models.TicketService.objects.get(
             id=int(request.data.get("assignedServicetId"))
@@ -212,19 +226,35 @@ def ticket_device_services_handler(request, ticket_device_id):
             int(request.data.get("requiredQty")) * assigned_service.service_price
         )
         ticket.save()
+        ticket_serializer = serializers.TicketSerializers(ticket, many=False)
+
         return Response(
-            status=status.HTTP_201_CREATED, data=ticket_device_service_serializer.data
+            status=status.HTTP_201_CREATED,
+            data={
+                "ticket_device_services": ticket_device_service_serializer.data,
+                "ticket_details": ticket_serializer.data,
+            },
         )
     elif request.method == "DELETE":
-        models.TicketDeviceService.objects.filter(
+        service_to_be_deleted = models.TicketDeviceService.objects.filter(
             assigned_service=Configurations_Models.TicketService.objects.get(
                 id=int(request.data.get("assignedServiceId"))
             ),
             related_ticket_device=ticket_device,
-        ).delete()
+        ).first()
+        ticket.total_cost -= (
+            service_to_be_deleted.required_qty
+            * service_to_be_deleted.assigned_service.service_price
+        )
+        ticket.save()
+        ticket_serializer = serializers.TicketSerializers(ticket, many=False)
+
+        service_to_be_deleted.delete()
         return Response(
-            status=status.HTTP_205_RESET_CONTENT,
-            data=ticket_device_service_serializer.data,
+            data={
+                "ticket_device_services": ticket_device_service_serializer.data,
+                "ticket_details": ticket_serializer.data,
+            },
         )
 
 

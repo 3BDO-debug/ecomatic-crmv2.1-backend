@@ -82,3 +82,8 @@ class RegionSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Region
         fields = "__all__"
+
+    def to_representation(self, instance):
+        rep = super(RegionSerializer, self).to_representation(instance)
+        rep["related_city_name"] = instance.related_city.city_name
+        return rep

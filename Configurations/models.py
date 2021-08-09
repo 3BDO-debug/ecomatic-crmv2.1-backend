@@ -25,7 +25,8 @@ class Category(models.Model):
         choices=[
             ("hoods", "Hoods"),
             ("slim-hobs", "Slim Hobs"),
-            ("ovens", "Ovens"),
+            ("gas-ovens", "Gas Ovens"),
+            ("electric-ovens", "Electric Ovens"),
             ("cookers", "Cookers"),
         ],
     )
@@ -166,6 +167,13 @@ class City(models.Model):
 
 
 class Region(models.Model):
+    related_city = models.ForeignKey(
+        City,
+        on_delete=models.CASCADE,
+        verbose_name="Related City",
+        null=True,
+        blank=True,
+    )
     region_name = models.CharField(max_length=350, verbose_name="Region Name")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Created At")
 
