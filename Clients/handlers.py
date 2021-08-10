@@ -26,7 +26,7 @@ def expected_warranty_start_date_calc(request):
     else:
         expected_warranty_start_date = (
             datetime.datetime.strptime(request.data.get("date"), "%Y-%m-%d")
-            + relativedelta(months=3)
+            + relativedelta(months=6)
         ).date()
     return Response({"expected_warranty_start_date": expected_warranty_start_date})
 
@@ -147,7 +147,7 @@ def client_devices_handler(request, client_id):
     client = models.Client.objects.get(id=client_id)
 
     if request.method == "POST":
-        
+
         models.ClientDevice.objects.create(
             related_client=client,
             related_storage_item=Storage_Models.Item.objects.get(
