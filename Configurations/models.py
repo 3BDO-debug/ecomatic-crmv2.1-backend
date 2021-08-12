@@ -36,6 +36,7 @@ class Category(models.Model):
         choices=[
             ("natural-gas", "Natural Gas"),
             ("gas-cylinder", "Gas Cylinder"),
+            ("electricity", "Electricty"),
             ("internal-expulsion", "Internal Expulsion"),
             ("external-expulsion", "External Expulsion"),
         ],

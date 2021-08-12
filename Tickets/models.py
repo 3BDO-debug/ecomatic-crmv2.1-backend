@@ -56,11 +56,8 @@ class TicketDevice(models.Model):
     common_diagnostics = models.CharField(
         max_length=350, verbose_name="Common Diagnostics", null=True, blank=True
     )
-    is_completed = models.BooleanField(
-        verbose_name="Is Completed", null=True, blank=True
-    )
-    is_not_completed = models.BooleanField(
-        verbose_name="Is Not Completed", null=True, blank=True
+    device_ticket_status = models.CharField(
+        verbose_name="Device Ticket Status", max_length=350, default="Under Processing"
     )
     not_completed_notes = models.TextField(
         verbose_name="Not Completed Notes", null=True, blank=True
@@ -69,7 +66,9 @@ class TicketDevice(models.Model):
         verbose_name="Extra Notes",
         null=True,
         blank=True,
-        default="Device Extra Notes Goes Here",
+    )
+    customer_service_notes = models.TextField(
+        verbose_name="Customer Service Notes", null=True, blank=True
     )
 
     class Meta:

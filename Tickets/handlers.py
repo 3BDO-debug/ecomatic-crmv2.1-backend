@@ -105,9 +105,7 @@ def ticket_devices_handler(request, ticket_id):
             ticket_device_to_be_updated.device_ticket_type = request.data.get(
                 "deviceTicketType"
             )
-            ticket_device_to_be_updated.device_ticket_status = request.data.get(
-                "deviceTicketStatus"
-            )
+            ticket_device_to_be_updated.device_ticket_status = "Under Processing"
             ticket_device_to_be_updated.common_diagnostics = request.data.get(
                 "commonDiagnostic"
             )
@@ -118,17 +116,25 @@ def ticket_devices_handler(request, ticket_id):
         elif request.data.get("currentStage") == "technician-stage":
 
             if request.data.get("markCompleted"):
-                ticket_device_to_be_updated.is_completed = True
-                ticket_device_to_be_updated.is_not_completed = False
+                ticket_device_to_be_updated.device_ticket_status = "Completed"
+
                 ticket_device_to_be_updated.save()
             elif request.data.get("markNotCompleted"):
 
                 ticket_device_to_be_updated.not_completed_notes = request.data.get(
                     "notCompletedNotes"
                 )
-                ticket_device_to_be_updated.is_completed = False
-                ticket_device_to_be_updated.is_not_completed = True
+                ticket_device_to_be_updated.device_ticket_status = "Not Completed"
+
                 ticket_device_to_be_updated.save()
+        elif request.data.get("currentStage") == "customer-service-stage":
+
+            ticket_device_to_be_updated.customer_service_notes = request.data.get(
+                "customerServiceNotes"
+            )
+            if bool(request.data.get("reOpenTicketDevice")):
+                ticket_device_to_be_updated.device_ticket_status = "Re Opened"
+            ticket_device_to_be_updated.save()
 
     elif request.method == "DELETE":
         models.TicketDevice.objects.filter(

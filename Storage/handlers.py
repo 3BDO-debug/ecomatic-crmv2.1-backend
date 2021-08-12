@@ -75,15 +75,11 @@ def items_handler(request):
         return Response(status=status.HTTP_200_OK, data=items_serializer.data)
 
 
-@api_view(["GET", "POST", "DELETE"])
+@api_view(["GET", "POST", "PUT", "DELETE"])
 def spare_parts_handler(request):
-    if request.method == "GET":
-        spare_parts = models.SparePart.objects.all()
-        spare_parts_serializer = serializers.SparePartSerializers(
-            spare_parts, many=True
-        )
-        return Response(spare_parts_serializer.data)
-    elif request.method == "POST":
+    spareparts = models.SparePart.objects.all()
+    spareparts_serializer = serializers.SparePartSerializers(spareparts, many=True)
+    if request.method == "POST":
         created_spare_parts = models.SparePart.objects.create(
             related_warehouse=models.Warehouse.objects.get(
                 id=int(request.data.get("relatedWarehouse"))
@@ -93,19 +89,22 @@ def spare_parts_handler(request):
             spare_part_price=float(request.data.get("sparePartPrice")),
             available_qty=int(request.data.get("availableQuantity")),
         )
-        spare_parts_serializer = serializers.SparePartSerializers(
-            created_spare_parts, many=False
+
+    elif request.method == "PUT":
+        sparepart_to_be_edited = models.SparePart.objects.get(
+            id=request.data.get("sparepartId")
         )
-        return Response(
-            status=status.HTTP_201_CREATED, data=spare_parts_serializer.data
+        sparepart_to_be_edited.available_qty = int(
+            request.data.get("availableQuantity")
         )
+        sparepart_to_be_edited.save()
+
     elif request.method == "DELETE":
         models.SparePart.objects.filter(
             id__in=literal_eval(request.data.get("sparepartsToBeDeleted"))
         ).delete()
-        spareparts = models.SparePart.objects.all()
-        spareparts_serializer = serializers.SparePartSerializers(spareparts, many=True)
-        return Response(status=status.HTTP_200_OK, data=spareparts_serializer.data)
+
+    return Response(status=status.HTTP_200_OK, data=spareparts_serializer.data)
 
 
 @api_view(["GET", "POST", "DELETE"])
@@ -144,6 +143,3 @@ def custody_details_handler(request, custody_id):
         custody_spareparts, many=True
     )
     return Response(status=status.HTTP_200_OK, data=custody_spareparts_serializer.data)
-
-
-
