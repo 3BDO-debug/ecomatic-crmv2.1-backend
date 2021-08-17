@@ -94,7 +94,7 @@ SIMPLE_JWT = {
 CORS_ORIGIN_WHITELIST = [
     "http://localhost:3000",
     #"https://ecomatic-crm-v2-0-frontend.vercel.app",
-    "https://ecomatic-crm-ar-34a6okvcd-3bdo-debug.vercel.app",
+    "https://ecomatic-crm-ar.vercel.app",
     #"https://ecomatic-crm-v2-0-en-orycdwiav-3bdo-debug.vercel.app",
 ]
 
