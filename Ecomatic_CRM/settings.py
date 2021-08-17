@@ -91,12 +91,7 @@ SIMPLE_JWT = {
     "TOKEN_TYPE_CLAIM": "token_type",
 }
 
-CORS_ORIGIN_WHITELIST = [
-    "http://localhost:3000",
-    #"https://ecomatic-crm-v2-0-frontend.vercel.app",
-    "https://ecomatic-crm-ar.vercel.app",
-    #"https://ecomatic-crm-v2-0-en-orycdwiav-3bdo-debug.vercel.app",
-]
+CORS_ALLOW_ALL_ORIGINS = True
 
 
 TEMPLATES = [
