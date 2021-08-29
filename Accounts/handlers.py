@@ -48,6 +48,7 @@ def email_username_lookup_handler(request):
 @authentication_classes([])
 @permission_classes([])
 def signup_handler(request):
+    print(request.data)
     models.User.objects.create_user(
         first_name=request.data.get("firstName"),
         last_name=request.data.get("lastName"),
@@ -57,8 +58,8 @@ def signup_handler(request):
         address=request.data.get("address"),
         gov_id=request.data.get("govId"),
         password=request.data.get("password"),
-        role=request.data.get("userRole"),
-        personal_pic=request.data.get("profilePic"),
+        role=request.data.get("role"),
+        personal_pic=request.data.get("profilePic")["preview"],
         device_identifier="device_identifier",
     )
     return Response(status=status.HTTP_201_CREATED)

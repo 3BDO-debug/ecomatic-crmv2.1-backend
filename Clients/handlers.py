@@ -1,4 +1,7 @@
 import datetime
+import json
+from Ecomatic_CRM.utils import convert_my_iso_8601
+from pytz import timezone
 from dateutil.relativedelta import relativedelta
 from . import models, serializers
 from rest_framework.decorators import (
@@ -20,12 +23,12 @@ from ast import literal_eval
 def expected_warranty_start_date_calc(request):
     if bool(request.data.get("invoiceAvailabe")):
         expected_warranty_start_date = (
-            datetime.datetime.strptime(request.data.get("date"), "%Y-%m-%d")
+            datetime.datetime.strptime(request.data.get("date"), "%Y- %m- %d")
             + relativedelta(months=2)
         ).date()
     else:
         expected_warranty_start_date = (
-            datetime.datetime.strptime(request.data.get("date"), "%Y-%m-%d")
+            datetime.datetime.strptime(request.data.get("date"), "%Y- %m- %d")
             + relativedelta(months=6)
         ).date()
     return Response({"expected_warranty_start_date": expected_warranty_start_date})
@@ -35,7 +38,7 @@ def expected_warranty_start_date_calc(request):
 def client_device_warranty_status_checker(request):
     installation_date = request.data.get("installationDate")
     warranty_expiry_date = (
-        datetime.datetime.strptime(installation_date, "%Y-%m-%d")
+        datetime.datetime.strptime(installation_date, "%Y- %m-%d")
         + relativedelta(months=int(request.data.get("itemWarrantyCoverage")))
     ).date()
 
@@ -74,72 +77,62 @@ def client_lookup_handler(request):
 @api_view(["GET", "POST", "DELETE"])
 def clients_handler(request):
 
-    if request.method == "GET":
-
-        clients = models.Client.objects.all()
-        client_serializer = serializers.ClientsSerializer(clients, many=True)
-        return Response(client_serializer.data)
-    elif request.method == "POST":
-        created_client = models.Client.objects.get_or_create(
-            client_full_name=request.data.get("clientFullName"),
+    if request.method == "POST":
+        models.Client.objects.get_or_create(
+            client_full_name=request.data.get("fullname"),
             client_category=Configurations_Models.ClientCategory.objects.get(
-                id=int(request.data.get("clientCategoryId"))
+                id=int(request.data.get("category"))
             ),
-            client_phone_number_1=request.data.get("clientPhoneNumber1"),
-            client_phone_number_2=request.data.get("clientPhoneNumber2"),
-            client_landline_number=request.data.get("clientLandlineNumber"),
+            client_phone_number_1=request.data.get("phoneNumber1"),
+            client_phone_number_2=request.data.get("phoneNumber2"),
+            client_landline_number=request.data.get("landline"),
             client_city=Configurations_Models.City.objects.get(
-                id=int(request.data.get("clientCity"))
+                id=int(request.data.get("city"))
             ),
             client_region=Configurations_Models.Region.objects.get(
-                id=int(request.data.get("clientRegion"))
+                id=int(request.data.get("region"))
             ),
-            client_address=request.data.get("clientAddress"),
-            client_building_no=request.data.get("clientBuildingNo"),
-            client_floor_no=request.data.get("clientFloorNo"),
-            client_apartment_no=request.data.get("clientApartmentNo"),
+            client_address=request.data.get("address"),
+            client_building_no=request.data.get("buildingNo"),
+            client_floor_no=request.data.get("floorNo"),
+            client_apartment_no=request.data.get("apartmentNo"),
             client_address_landmark=request.data.get("landmark"),
         )
-        client_serializer = serializers.ClientsSerializer(created_client[0], many=False)
-
-        return Response(status=status.HTTP_201_CREATED, data=client_serializer.data)
     elif request.method == "DELETE":
         models.Client.objects.filter(
             id__in=literal_eval(request.data.get("clientsToBeDeleted"))
         ).delete()
-        clients = models.Client.objects.all()
-        clients_serializer = serializers.ClientsSerializer(clients, many=True)
-        return Response(status=status.HTTP_200_OK, data=clients_serializer.data)
+    clients = models.Client.objects.all()
+    client_serializer = serializers.ClientsSerializer(clients, many=True)
+    return Response(client_serializer.data)
 
 
 @api_view(["GET", "PUT"])
 def client_details_handler(request, client_id):
     client = models.Client.objects.get(id=client_id)
-    if request.method == "GET":
 
-        client_serializer = serializers.ClientsSerializer(client, many=False)
+    client_serializer = serializers.ClientsSerializer(client, many=False)
 
-        return Response(client_serializer.data)
-    elif request.method == "PUT":
-        client.client_full_name = request.data.get("client_full_name")
+    if request.method == "PUT":
+        client.client_full_name = request.data.get("fullname")
         client.client_category = Configurations_Models.ClientCategory.objects.get(
-            id=int(request.data.get("clientCategoryId"))
+            id=int(request.data.get("category"))
         )
-        client.client_phone_number_1 = request.data.get("client_phone_number_1")
-        client.client_phone_number_2 = request.data.get("client_phone_number_2")
-        client.client_landline_number = request.data.get("client_landline_number")
+        client.client_phone_number_1 = request.data.get("phoneNumber1")
+        client.client_phone_number_2 = request.data.get("phoneNumber2")
+        client.client_landline_number = request.data.get("landline")
         client.client_city = Configurations_Models.City.objects.get(
-            id=int(request.data.get("client_city"))
+            id=int(request.data.get("city"))
         )
         client.client_region = Configurations_Models.Region.objects.get(
-            id=int(request.data.get("client_region"))
+            id=int(request.data.get("region"))
         )
-        client.client_building_no = request.data.get("client_building_no")
-        client.client_floor_no = request.data.get("client_floor_no")
-        client.client_apartment_no = request.data.get("client_apartment_no")
-        client.client_address = request.data.get("client_address")
+        client.client_building_no = request.data.get("buildingNo")
+        client.client_floor_no = request.data.get("floorNo")
+        client.client_apartment_no = request.data.get("apartmentNo")
+        client.client_address = request.data.get("address")
         client.save()
-        return Response(data=request.data, status=status.HTTP_200_OK)
+    return Response(client_serializer.data)
 
 
 @api_view(["GET", "POST", "DELETE"])
@@ -147,26 +140,45 @@ def client_devices_handler(request, client_id):
     client = models.Client.objects.get(id=client_id)
 
     if request.method == "POST":
-
+        request_data = json.loads(request.data.get("formikValues"))
+        print("hello", request_data["expectedWarrantyStartDate"])
         models.ClientDevice.objects.create(
             related_client=client,
             related_storage_item=Storage_Models.Item.objects.get(
-                id=int(request.data.get("selectedItem"))
+                id=int(request_data["device"])
             ),
-            device_feeding_source=request.data.get("selectedDeviceFeedingSource"),
-            manufacturing_date=request.data.get("manufacturingDate"),
-            purchasing_date=request.data.get("purchasingDate"),
-            expected_warranty_start_date=request.data.get("expectedWarrantyStartDate"),
+            device_feeding_source=request_data["feedingSource"],
+            manufacturing_date=convert_my_iso_8601(
+                request_data["manufacturingDate"], timezone("EET")
+            )
+            if request_data["manufacturingDate"]
+            else None,
+            purchasing_date=convert_my_iso_8601(
+                request_data["purchasingDate"], timezone("EET")
+            )
+            if request_data["purchasingDate"]
+            else None,
+            expected_warranty_start_date=request_data["expectedWarrantyStartDate"]
+            if request_data["expectedWarrantyStartDate"]
+            else None,
             installed_through_the_company=bool(
-                request.data.get("installedThroughTheCompany")
+                request_data["installedThroughTheCompany"]
             ),
-            installation_date=request.data.get("installationDate"),
-            warranty_start_date=request.data.get("warrantyStartDate"),
-            in_warranty=bool(request.data.get("warrantyStatus")),
-            related_branch=request.data.get("selectedBranch"),
-            related_distributor=request.data.get("selectedDistributor"),
+            installation_date=convert_my_iso_8601(
+                request_data["installationDate"], timezone("EET")
+            )
+            if request_data["installationDate"]
+            else None,
+            warranty_start_date=convert_my_iso_8601(
+                request_data["warrantyStartDate"], timezone("EET")
+            )
+            if request_data["warrantyStartDate"]
+            else None,
+            in_warranty=bool(request_data["warrantyStatus"]),
+            related_branch=request_data["branch"],
+            related_distributor=request_data["distributor"],
             device_invoice_or_manufacturer_label=request.data.get(
-                "uploadedDeviceInvoiceOrManufacturerLabel"
+                "deviceInvoiceOrManufacturingLabel"
             ),
         ).save()
 

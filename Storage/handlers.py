@@ -14,65 +14,52 @@ from Storage import models as Storage_Models
 
 @api_view(["GET", "POST", "DELETE"])
 def warehouses_handler(request):
-    if request.method == "GET":
-        warehouse = models.Warehouse.objects.all()
-        warehouse_serializer = serializers.WarehouseSerializers(warehouse, many=True)
-        return Response(warehouse_serializer.data)
-    elif request.method == "POST":
+    warehouse = models.Warehouse.objects.all()
+    warehouses_serializer = serializers.WarehouseSerializers(warehouse, many=True)
 
-        created_warehouse = models.Warehouse.objects.create(
+    if request.method == "POST":
+
+        models.Warehouse.objects.create(
             warehouse_name=request.data.get("warehouseName"),
             assigned_to=Accounts_Models.User.objects.get(
                 id=int(request.data.get("assignedTo"))
             ),
-        )
-        warehouse_serializer = serializers.WarehouseSerializers(
-            created_warehouse, many=False
-        )
-        created_warehouse.save()
-        return Response(status=status.HTTP_201_CREATED, data=warehouse_serializer.data)
+        ).save()
 
     elif request.method == "DELETE":
-
         models.Warehouse.objects.filter(
             id__in=literal_eval(request.data.get("warehousesToBeDeleted"))
         ).delete()
 
-        warehouses = models.Warehouse.objects.all()
-        warehouses_serializer = serializers.WarehouseSerializers(warehouses, many=True)
-        return Response(status=status.HTTP_200_OK, data=warehouses_serializer.data)
+    return Response(status=status.HTTP_200_OK, data=warehouses_serializer.data)
 
 
 @api_view(["GET", "POST", "DELETE"])
 def items_handler(request):
-    if request.method == "GET":
-        items = models.Item.objects.all()
-        items_serializer = serializers.ItemSerializers(items, many=True)
-        return Response(items_serializer.data)
-    elif request.method == "POST":
-        created_item = models.Item.objects.create(
+    items = models.Item.objects.all()
+    items_serializer = serializers.ItemSerializers(items, many=True)
+
+    if request.method == "POST":
+        models.Item.objects.create(
             related_warehouse=models.Warehouse.objects.get(
-                id=int(request.data.get("relatedWarehouse"))
+                id=int(request.data.get("warehouse"))
             ),
             brand=request.data.get("brand"),
             category=request.data.get("category"),
-            item_model_number=request.data.get("itemModelNumber"),
-            item_img=request.data.get("itemImg"),
-            main_dimension=request.data.get("mainDimension"),
-            cut_off_dimension=request.data.get("cutoffDimension"),
+            item_model_number=request.data.get("modelNumber"),
+            item_img=request.data.get("image")["path"],
+            main_dimension=request.data.get("mainDimensions"),
+            cut_off_dimension=request.data.get("cutOffDimensions"),
             warranty_coverage=int(request.data.get("warrantyCoverage")),
-        )
-        items_serializer = serializers.ItemSerializers(created_item, many=False)
-        created_item.save()
-        return Response(status=status.HTTP_201_CREATED, data=items_serializer.data)
+        ).save()
+
     elif request.method == "DELETE":
 
         models.Item.objects.filter(
             id__in=literal_eval(request.data.get("itemsToBeDeleted"))
         ).delete()
-        items = models.Item.objects.all()
-        items_serializer = serializers.ItemSerializers(items, many=True)
-        return Response(status=status.HTTP_200_OK, data=items_serializer.data)
+
+    return Response(items_serializer.data)
 
 
 @api_view(["GET", "POST", "PUT", "DELETE"])
@@ -82,12 +69,12 @@ def spare_parts_handler(request):
     if request.method == "POST":
         created_spare_parts = models.SparePart.objects.create(
             related_warehouse=models.Warehouse.objects.get(
-                id=int(request.data.get("relatedWarehouse"))
+                id=int(request.data.get("warehouse"))
             ),
-            spare_part_model_number=request.data.get("sparePartModelNumber"),
-            spare_part_img=request.data.get("sparePartImage"),
-            spare_part_price=float(request.data.get("sparePartPrice")),
-            available_qty=int(request.data.get("availableQuantity")),
+            spare_part_model_number=request.data.get("modelNumber"),
+            spare_part_img=request.data.get("image")["path"],
+            spare_part_price=float(request.data.get("pricePerUnit")),
+            available_qty=int(request.data.get("availableQTY")),
         )
 
     elif request.method == "PUT":

@@ -102,4 +102,4 @@ class ClientDevice(models.Model):
         verbose_name_plural = "Client Devices"
 
     def __str__(self):
-        return f"New Device For {self.related_client.client_full_name}"
+        return f"New Device For {self.related_client.client_full_name}-{self.related_storage_item.item_model_number}"
