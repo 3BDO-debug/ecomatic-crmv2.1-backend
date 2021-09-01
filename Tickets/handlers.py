@@ -26,7 +26,7 @@ def tickets_handler(request):
         tickets_serializer = serializers.TicketSerializers(tickets, many=True)
         return Response(tickets_serializer.data)
     elif request.method == "DELETE":
-        print("wlaaa")
+
         models.Ticket.objects.filter(
             id__in=literal_eval(request.data.get("ticketsToBeDeleted"))
         ).delete()
@@ -221,7 +221,7 @@ def ticket_device_services_handler(request, ticket_device_id):
     elif request.method == "POST":
 
         assigned_service = Configurations_Models.TicketService.objects.get(
-            id=int(request.data.get("assignedServicetId"))
+            id=int(request.data.get("assignedServiceId"))
         )
         models.TicketDeviceService.objects.create(
             related_ticket_device=ticket_device,
@@ -302,32 +302,25 @@ def ticket_updates_handler(request):
 
 @api_view(["GET", "POST"])
 def ticket_followback_call_rating_handler(request, ticket_id):
-    if request.method == "GET":
 
-        ticket_followback_call_rating = models.TicketFollowbackCallRating.objects.get(
-            related_ticket=ticket_id
-        )
-
-        ticket_followback_call_rating_serializer = (
-            serializers.TicketFollowbackCallRatingSerializer(
-                ticket_followback_call_rating, many=False
-            )
-        )
-        return Response(data=ticket_followback_call_rating_serializer.data)
     if request.method == "POST":
-        ticket_followback_call_rating = (
-            models.TicketFollowbackCallRating.objects.create(
-                related_ticket=models.Ticket.objects.get(id=ticket_id),
-                rating=int(request.data.get("rating")),
-                notes=request.data.get("notes"),
-            )
+
+        models.TicketFollowbackCallRating.objects.create(
+            related_ticket=models.Ticket.objects.get(id=ticket_id),
+            rating=int(request.data.get("rating")),
+            notes=request.data.get("notes"),
         )
-        ticket_followback_call_rating_serializer = (
-            serializers.TicketFollowbackCallRatingSerializer(
-                ticket_followback_call_rating, many=False
-            )
+    ticket_followback_call_rating = models.TicketFollowbackCallRating.objects.get(
+        related_ticket=ticket_id
+    )
+
+    ticket_followback_call_rating_serializer = (
+        serializers.TicketFollowbackCallRatingSerializer(
+            ticket_followback_call_rating, many=False
         )
-        return Response(data=ticket_followback_call_rating_serializer.data)
+    )
+
+    return Response(data=ticket_followback_call_rating_serializer.data)
 
 
 """ Ticket Completion Forms """

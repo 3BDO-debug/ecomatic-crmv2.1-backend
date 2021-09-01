@@ -14,6 +14,12 @@ class TicketSerializers(serializers.ModelSerializer):
         rep["client_phone_number_2"] = instance.related_client.client_phone_number_2
         rep["client_landline_number"] = instance.related_client.client_landline_number
         rep["client_address"] = instance.related_client.client_address
+        rep["client_city"] = instance.related_client.client_city.city_name
+        rep["client_region"] = instance.related_client.client_region.region_name
+        rep["client_building_no"] = instance.related_client.client_building_no
+        rep["client_apartment_no"] = instance.related_client.client_apartment_no
+        rep["client_floor_no"] = instance.related_client.client_floor_no
+        rep["client_landmark"] = instance.related_client.client_address_landmark
 
         rep["technician_name"] = (
             f"{instance.related_technician.first_name} {instance.related_technician.last_name}"
