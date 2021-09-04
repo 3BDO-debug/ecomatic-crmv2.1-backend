@@ -1,1 +1,1 @@
-web: gunicorn Ecomatic_CRM.wsgi 
+web: waitress-serve  Ecomatic_CRM.wsgi:application
