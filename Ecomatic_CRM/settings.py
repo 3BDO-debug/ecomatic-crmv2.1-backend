@@ -25,7 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = "django-insecure-^&_*#yl#v5d6h%s1$)+yg*_0r2*#=cxchqsfd^)ny54z_uqat*"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ["*"]
 
@@ -52,7 +52,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
-    # "whitenoise.middleware.WhiteNoiseMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -156,7 +156,6 @@ USE_L10N = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
-""" STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage" """
 
 
 STATIC_URL = "/styling/"
@@ -166,3 +165,4 @@ STATIC_ROOT = BASE_DIR / "stylingFiles"
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
