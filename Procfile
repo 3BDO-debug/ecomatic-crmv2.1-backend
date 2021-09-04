@@ -1,1 +1,1 @@
-web: waitress-serve  Ecomatic_CRM.wsgi:application
+web: waitress-serve --port=$PORT  Ecomatic_CRM.wsgi:application
