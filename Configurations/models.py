@@ -23,11 +23,11 @@ class Category(models.Model):
         max_length=350,
         verbose_name="Category Name",
         choices=[
-            ("hoods", "Hoods"),
-            ("slim-hobs", "Slim Hobs"),
-            ("gas-ovens", "Gas Ovens"),
-            ("electric-ovens", "Electric Ovens"),
-            ("cookers", "Cookers"),
+            ("hood", "Hood"),
+            ("slim-hob", "Slim Hob"),
+            ("gas-oven", "Gas Oven"),
+            ("electric-oven", "Electric Oven"),
+            ("cooker", "Cooker"),
         ],
     )
     category_feeding_source = models.CharField(
@@ -48,7 +48,7 @@ class Category(models.Model):
         verbose_name_plural = "Categories"
 
     def __str__(self):
-        return self.category_name
+        return f"{self.category_name} - {self.related_brand.brand_name}"
 
 
 class Branch(models.Model):

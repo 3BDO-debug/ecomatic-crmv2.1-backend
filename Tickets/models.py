@@ -1,6 +1,5 @@
+import datetime as dt
 from django.db import models
-
-# Create your models here.
 from Storage import models as Storage_Models
 from Clients import models as Clients_Models
 from Accounts import models as Accounts_Models
@@ -11,6 +10,10 @@ from Configurations import models as Configurations_Models
 
 
 class Ticket(models.Model):
+    ticket_generated_id = models.CharField(
+        max_length=350,
+        verbose_name="Ticket ID",
+    )
     related_client = models.ForeignKey(
         Clients_Models.Client, on_delete=models.CASCADE, verbose_name="Related Client"
     )
@@ -34,8 +37,33 @@ class Ticket(models.Model):
         verbose_name = "Ticket"
         verbose_name_plural = "Tickets"
 
+    def ticket_id_generator(self):
+        months = {
+            "1": "A",
+            "2": "B",
+            "3": "C",
+            "4": "D",
+            "5": "E",
+            "6": "F",
+            "7": "G",
+            "8": "H",
+            "9": "I",
+            "10": "J",
+            "11": "K",
+            "12": "L",
+        }
+        tdy_day = str(dt.datetime.today().day)
+        tdy_month = str(dt.datetime.today().month)
+        tdy_year = str(dt.datetime.today().year)[-2:]
+        ticket_order = Ticket.objects.filter(created_at__gt=dt.date.today()).count() + 1
+        return f"{tdy_year}{months[tdy_month]}{tdy_day}-{ticket_order}"
+
     def __str__(self):
         return f"{self.related_client.client_full_name}'s ticket"
+
+    def save(self, *args, **kwargs):
+        self.ticket_generated_id = self.ticket_id_generator()
+        super(Ticket, self).save(*args, **kwargs)
 
 
 class TicketDevice(models.Model):

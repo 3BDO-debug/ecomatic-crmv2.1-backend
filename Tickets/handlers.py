@@ -303,24 +303,32 @@ def ticket_updates_handler(request):
 @api_view(["GET", "POST"])
 def ticket_followback_call_rating_handler(request, ticket_id):
 
+    if request.method == "GET":
+
+        ticket_followback_call_rating = models.TicketFollowbackCallRating.objects.get(
+            related_ticket=ticket_id
+        )
+
+        ticket_followback_call_rating_serializer = (
+            serializers.TicketFollowbackCallRatingSerializer(
+                ticket_followback_call_rating, many=False
+            )
+        )
+        return Response(data=ticket_followback_call_rating_serializer.data)
     if request.method == "POST":
-
-        models.TicketFollowbackCallRating.objects.create(
-            related_ticket=models.Ticket.objects.get(id=ticket_id),
-            rating=int(request.data.get("rating")),
-            notes=request.data.get("notes"),
+        ticket_followback_call_rating = (
+            models.TicketFollowbackCallRating.objects.create(
+                related_ticket=models.Ticket.objects.get(id=ticket_id),
+                rating=int(request.data.get("rating")),
+                notes=request.data.get("notes"),
+            )
         )
-    ticket_followback_call_rating = models.TicketFollowbackCallRating.objects.get(
-        related_ticket=ticket_id
-    )
-
-    ticket_followback_call_rating_serializer = (
-        serializers.TicketFollowbackCallRatingSerializer(
-            ticket_followback_call_rating, many=False
+        ticket_followback_call_rating_serializer = (
+            serializers.TicketFollowbackCallRatingSerializer(
+                ticket_followback_call_rating, many=False
+            )
         )
-    )
-
-    return Response(data=ticket_followback_call_rating_serializer.data)
+        return Response(data=ticket_followback_call_rating_serializer.data)
 
 
 """ Ticket Completion Forms """
@@ -353,7 +361,7 @@ def gas_oven_installation_requirements_form_handler(request, ticket_device_id):
             grill_fonia_number=request.data.get("grillFoniaNumber"),
             whats_done_by_the_technician=request.data.get("whatsDoneByTechnician"),
             gas_oven_final_condition=request.data.get("gasOvenFinalCondition"),
-            notes=request.data.get("notes"),
+            notes=request.data.get("whatsDoneByTechnician"),
             client_signature=request.data.get("clientSignature"),
             technician_name=request.data.get("technicianName"),
         ).save()
@@ -440,7 +448,7 @@ def slim_hob_installation_requirements_form_handler(request, ticket_device_id):
             slim_hob_final_condition=request.data.get("slimHobFinalCondition"),
             client_signature=request.data.get("clientSignature"),
             technician_name=request.data.get("technicianName"),
-            notes=request.data.get("notes"),
+            notes=request.data.get("slimHobFinalCondition"),
         ).save()
         return Response(status=status.HTTP_201_CREATED)
     elif request.method == "GET":
@@ -471,7 +479,7 @@ def cooker_installation_requirements_form_handler(request, ticket_device_id):
             cooker_model_number=request.data.get("cookerModelNumber"),
             gas_type=request.data.get("gasType"),
             gas_pressure=request.data.get("gasPressure"),
-            notes=request.data.get("notes"),
+            notes=request.data.get("cookerFinalCondition"),
             stabilizer_type=request.data.get("stabilizerType"),
             cooker_fonia_number=request.data.get("cookerFoniaNumber"),
             grill_fonia_number=request.data.get("grillFoniaNumber"),
@@ -510,7 +518,7 @@ def hood_installation_requirements_form_handler(request, ticket_device_id):
             hood_height=request.data.get("hoodHeight"),
             hood_exhaust_height=request.data.get("hoodExhaustHeight"),
             hood_exhaust_is_straight=bool(request.data.get("hoodExhaustIsStraight")),
-            notes=request.data.get("notes"),
+            notes=request.data.get("hoodFinalCondition"),
             whats_done_by_the_technician=request.data.get("whatsDoneByTechnician"),
             hood_final_condition=request.data.get("hoodFinalCondition"),
             client_signature=request.data.get("clientSignature"),
