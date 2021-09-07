@@ -122,8 +122,9 @@ DATABASES = {
         "NAME": BASE_DIR / "db.sqlite3",
     }
 }
+DATABASES["default"] = dj_database_url.config(conn_max_age=600, ssl_require=True)
 DATABASES["default"] = dj_database_url.config(
-    default="mysql://b25b47678af8c4:dab6dbfc@us-cdbr-east-04.cleardb.com/heroku_5fccb9cec331329?reconnect=true"
+    default="postgres://dhywkqjvvgjmov:6b60eae2bab055230c77ea80df5f0d078e319b38407448fdde83e8fa329c9b0d@ec2-35-153-114-74.compute-1.amazonaws.com:5432/d87renqn5854j7"
 )
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
