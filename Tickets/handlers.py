@@ -10,6 +10,7 @@ from ast import literal_eval
 from Storage import models as Storage_Models
 from System_Updates import models as System_Updates_Models
 from Configurations import models as Configurations_Models
+from .utils import installationRequirementsFormsResetter
 
 
 @api_view(["GET", "DELETE"])
@@ -56,28 +57,9 @@ def ticket_details_handler(request, ticket_id):
                 related_client_device = Clients_Models.ClientDevice.objects.get(
                     id=ticket_device.related_client_device.id
                 )
-                if (
-                    datetime.date.today()
-                    > related_client_device.purchasing_date + relativedelta(months=2)
-                ):
-                    related_client_device.installation_date = datetime.date.today()
-
-                    related_client_device.warranty_start_date = (
-                        related_client_device.purchasing_date + relativedelta(months=2)
-                    )
-                else:
-                    related_client_device.installation_date = datetime.date.today()
-                    related_client_device.warranty_start_date = datetime.date.today()
-                related_client_device.installed_through_the_company = True
-                related_client_device.in_warranty = (
-                    True
-                    if related_client_device.warranty_start_date
-                    + relativedelta(
-                        months=related_client_device.related_storage_item.warranty_coverage
-                    )
-                    > datetime.date.today()
-                    else False
-                )
+                related_client_device.installation_status = "Installed by the company"
+                related_client_device.installation_date = datetime.date.today()
+                related_client_device.warranty_start_date = datetime.date.today()
                 related_client_device.save()
 
     ticket_serializer = serializers.TicketSerializers(ticket, many=False)
@@ -127,13 +109,22 @@ def ticket_devices_handler(request, ticket_id):
                 ticket_device_to_be_updated.device_ticket_status = "Not Completed"
 
                 ticket_device_to_be_updated.save()
+            elif request.data.get("redirectTicketDevice"):
+                ticket_device_to_be_updated.device_ticket_status = "Redirected"
+                ticket_device_to_be_updated.customer_service_notes = request.data.get(
+                    "redirectionNotes"
+                )
+                ticket_device_to_be_updated.save()
+
         elif request.data.get("currentStage") == "customer-service-stage":
 
-            ticket_device_to_be_updated.customer_service_notes = request.data.get(
-                "customerServiceNotes"
+            ticket_device_to_be_updated.not_completed_notes = None
+            ticket_device_to_be_updated.device_ticket_status = "Under Processing"
+            ticket_device_to_be_updated.customer_service_notes = None
+            installationRequirementsFormsResetter(
+                ticket_id, ticket_device_to_be_updated.id
             )
-            if bool(request.data.get("reOpenTicketDevice")):
-                ticket_device_to_be_updated.device_ticket_status = "Re Opened"
+
             ticket_device_to_be_updated.save()
 
     elif request.method == "DELETE":

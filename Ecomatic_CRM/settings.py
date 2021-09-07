@@ -25,7 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = "django-insecure-^&_*#yl#v5d6h%s1$)+yg*_0r2*#=cxchqsfd^)ny54z_uqat*"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
 
@@ -122,7 +122,6 @@ DATABASES = {
         "NAME": BASE_DIR / "db.sqlite3",
     }
 }
-
 DATABASES["default"] = dj_database_url.config(conn_max_age=600, ssl_require=True)
 DATABASES["default"] = dj_database_url.config(
     default="postgres://dhywkqjvvgjmov:6b60eae2bab055230c77ea80df5f0d078e319b38407448fdde83e8fa329c9b0d@ec2-35-153-114-74.compute-1.amazonaws.com:5432/d87renqn5854j7"

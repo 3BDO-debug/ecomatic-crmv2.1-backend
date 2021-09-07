@@ -93,8 +93,8 @@ class ClientDevice(models.Model):
         verbose_name="Device Attachment",
     )
     in_warranty = models.BooleanField(verbose_name="In Warranty", null=True, blank=True)
-    installed_through_the_company = models.BooleanField(
-        verbose_name="Installed Through The Company", null=True, blank=True
+    installation_status = models.CharField(
+        max_length=350, verbose_name="Installation status", null=True, blank=True
     )
 
     class Meta:

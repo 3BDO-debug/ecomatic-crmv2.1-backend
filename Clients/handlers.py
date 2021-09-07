@@ -17,6 +17,7 @@ from Configurations import models as Configurations_Models
 from Storage import models as Storage_Models
 from Tickets import models as Tickets_Models, serializers as Tickets_Serializers
 from ast import literal_eval
+from .utils import client_device_warranty_status_updater
 
 
 @api_view(["POST"])
@@ -141,7 +142,6 @@ def client_devices_handler(request, client_id):
 
     if request.method == "POST":
         request_data = json.loads(request.data.get("formikValues"))
-        print("hello", request_data["expectedWarrantyStartDate"])
         models.ClientDevice.objects.create(
             related_client=client,
             related_storage_item=Storage_Models.Item.objects.get(
@@ -161,9 +161,7 @@ def client_devices_handler(request, client_id):
             expected_warranty_start_date=request_data["expectedWarrantyStartDate"]
             if request_data["expectedWarrantyStartDate"]
             else None,
-            installed_through_the_company=bool(
-                request_data["installedThroughTheCompany"]
-            ),
+            installation_status=request_data["installationStatus"],
             installation_date=convert_my_iso_8601(
                 request_data["installationDate"], timezone("EET")
             )
@@ -188,6 +186,7 @@ def client_devices_handler(request, client_id):
         ).delete()
 
     client_devices = models.ClientDevice.objects.filter(related_client=client)
+    client_device_warranty_status_updater(client_devices)
     client_devices_serializer = serializers.ClientDeviceSerializer(
         client_devices, many=True
     )

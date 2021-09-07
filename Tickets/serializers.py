@@ -60,9 +60,7 @@ class TicketDeviceSerializers(serializers.ModelSerializer):
         ] = instance.related_client_device.expected_warranty_start_date
         rep["warranty_start_date"] = instance.related_client_device.warranty_start_date
         rep["in_warranty"] = instance.related_client_device.in_warranty
-        rep[
-            "installed_through_the_company"
-        ] = instance.related_client_device.installed_through_the_company
+        rep["installation_status"] = instance.related_client_device.installation_status
         rep[
             "device_invoice_or_manufacturer_label"
         ] = instance.related_client_device.device_invoice_or_manufacturer_label.name
