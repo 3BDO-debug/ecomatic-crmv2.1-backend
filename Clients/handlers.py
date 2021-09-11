@@ -117,16 +117,16 @@ def client_details_handler(request, client_id):
     if request.method == "PUT":
         client.client_full_name = request.data.get("fullname")
         client.client_category = Configurations_Models.ClientCategory.objects.get(
-            id=int(request.data.get("category"))
+            id=int(request.data.get("category")["id"])
         )
         client.client_phone_number_1 = request.data.get("phoneNumber1")
         client.client_phone_number_2 = request.data.get("phoneNumber2")
         client.client_landline_number = request.data.get("landline")
         client.client_city = Configurations_Models.City.objects.get(
-            id=int(request.data.get("city"))
+            id=int(request.data.get("city")["id"])
         )
         client.client_region = Configurations_Models.Region.objects.get(
-            id=int(request.data.get("region"))
+            id=int(request.data.get("region")["id"])
         )
         client.client_building_no = request.data.get("buildingNo")
         client.client_floor_no = request.data.get("floorNo")
