@@ -168,9 +168,9 @@ def client_devices_handler(request, client_id):
             if request_data["installationDate"]
             else None,
             warranty_start_date=convert_my_iso_8601(
-                request_data["warrantyStartDate"], timezone("EET")
+                request_data["installationDate"], timezone("EET")
             )
-            if request_data["warrantyStartDate"]
+            if request_data["installationDate"]
             else None,
             in_warranty=bool(request_data["warrantyStatus"]),
             related_branch=request_data["branch"],
