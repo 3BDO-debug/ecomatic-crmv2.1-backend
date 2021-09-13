@@ -185,7 +185,7 @@ def client_devices_handler(request, client_id):
             id__in=literal_eval(request.data.get("clientDevicesToBeDeleted"))
         ).delete()
 
-    client_devices = models.ClientDevice.objects.filter(related_client=client)
+    client_devices = models.ClientDevice.objects.filter(related_client=client).order_by('-created_at')
     client_device_warranty_status_updater(client_devices)
     client_devices_serializer = serializers.ClientDeviceSerializer(
         client_devices, many=True

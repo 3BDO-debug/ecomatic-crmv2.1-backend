@@ -96,6 +96,9 @@ class ClientDevice(models.Model):
     installation_status = models.CharField(
         max_length=350, verbose_name="Installation status", null=True, blank=True
     )
+    created_at = models.DateTimeField(
+        auto_now_add=True, null=True, blank=True, verbose_name="Created at"
+    )
 
     class Meta:
         verbose_name = "Client Device"
