@@ -2,6 +2,7 @@ from . import handlers
 from django.urls import path
 
 urlpatterns = [
+    path("Client-Logs/<int:client_id>", handlers.client_logs_handler),
     path(
         "Update-Ticket-Status-Request", handlers.update_ticket_status_requests_handler
     ),

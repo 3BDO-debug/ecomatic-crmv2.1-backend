@@ -2,6 +2,12 @@ from rest_framework import serializers
 from . import models
 
 
+class ClientLogsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.ClientLog
+        fields = "__all__"
+
+
 class UpdateTicketStatusRequestSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.UpdateTicketStatusRequest

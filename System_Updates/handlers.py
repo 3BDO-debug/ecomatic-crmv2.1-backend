@@ -4,6 +4,24 @@ from rest_framework.decorators import api_view
 from Tickets import models as Tickets_Models
 from Accounts import models as Accounts_Models
 from rest_framework import status
+from Clients import models as Clients_Models
+
+
+@api_view(["GET", "POST"])
+def client_logs_handler(request, client_id):
+    client = Clients_Models.Client.objects.get(id=client_id)
+    if request.method == "POST":
+        models.ClientLog.objects.create(
+            related_client=client,
+            action=request.data.get("action"),
+            created_by=f"{request.user.first_name} {request.user.last_name}",
+        ).save()
+
+    client_logs = models.ClientLog.objects.filter(related_client=client).order_by(
+        "-created_at"
+    )
+    client_logs_serializer = serializers.ClientLogsSerializer(client_logs, many=True)
+    return Response(client_logs_serializer.data)
 
 
 @api_view(["GET", "PUT"])
@@ -72,7 +90,7 @@ def ticket_logs_handler(request, ticket_id):
         ).save()
     ticket_logs = models.TicketLog.objects.filter(
         related_ticket=Tickets_Models.Ticket.objects.get(id=ticket_id)
-    )
+    ).order_by("-created_at")
     ticket_logs_serializer = serializers.TicketLogSerializer(ticket_logs, many=True)
 
     return Response(status=status.HTTP_200_OK, data=ticket_logs_serializer.data)

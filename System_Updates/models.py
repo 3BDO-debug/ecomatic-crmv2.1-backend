@@ -8,6 +8,22 @@ from Clients import models as Clients_Models
 # Create your models here.
 
 
+class ClientLog(models.Model):
+    related_client = models.ForeignKey(
+        Clients_Models.Client, on_delete=models.CASCADE, verbose_name="Related client"
+    )
+    action = models.CharField(max_length=350, verbose_name="Action done")
+    created_by = models.CharField(max_length=350, verbose_name="Created by")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Created at")
+
+    class Meta:
+        verbose_name = "Client log"
+        verbose_name_plural = "Client logs"
+
+    def __str__(self):
+        return f"New log by {self.created_by} - {self.created_at}"
+
+
 class UpdateTicketStatusRequest(models.Model):
     related_ticket = models.ForeignKey(Tickets_Models.Ticket, on_delete=models.CASCADE)
     current_stage = models.CharField(max_length=350, verbose_name="Current Stage")

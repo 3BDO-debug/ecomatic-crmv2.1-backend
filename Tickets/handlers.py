@@ -41,8 +41,12 @@ def ticket_details_handler(request, ticket_id):
     ticket = models.Ticket.objects.get(id=ticket_id)
     if request.method == "PUT":
         if request.data.get("technicianId"):
-            ticket.related_technician = Accounts_Models.User.objects.get(
-                id=int(request.data.get("technicianId"))
+            ticket.related_technician = (
+                Accounts_Models.User.objects.get(
+                    id=int(request.data.get("technicianId"))
+                )
+                if ticket.related_technician == None
+                else None
             )
 
         ticket.current_stage = request.data.get("currentStage")
