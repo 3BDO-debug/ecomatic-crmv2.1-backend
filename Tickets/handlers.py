@@ -1,4 +1,5 @@
 import datetime
+import json
 from dateutil.relativedelta import relativedelta
 from . import serializers, models
 from rest_framework.decorators import api_view
@@ -50,14 +51,16 @@ def ticket_details_handler(request, ticket_id):
             )
 
         ticket.current_stage = request.data.get("currentStage")
-        if request.data.get("isClosed"):
-            ticket.is_closed = True
-        if ticket.current_stage == "supervisor-stage" and ticket.is_closed:
-            ticket.is_closed = False
+        ticket.ticket_status = request.data.get("ticketStatus")
+        if request.data.get("forcedStatus"):
+            ticket.ticket_forced_status = request.data.get("forcedStatus")
         ticket_serializer = serializers.TicketSerializers(ticket, many=False)
         ticket.save()
         for ticket_device in models.TicketDevice.objects.filter(related_ticket=ticket):
-            if ticket_device.device_ticket_type == "Installation" and ticket.is_closed:
+            if (
+                ticket_device.device_ticket_type == "Installation"
+                and ticket.ticket_status == "Closed"
+            ):
                 related_client_device = Clients_Models.ClientDevice.objects.get(
                     id=ticket_device.related_client_device.id
                 )
@@ -82,6 +85,18 @@ def ticket_devices_handler(request, ticket_id):
         ticket_device_to_be_updated = models.TicketDevice.objects.get(
             id=int(request.data.get("ticketDeviceId"))
         )
+
+        if bool(request.data.get("agentNotes")):
+            ticket_device_to_be_updated.agent_notes = request.data.get("agentNotes")
+
+        if bool(request.data.get("technicalSupportNotes")):
+            ticket_device_to_be_updated.technical_support_notes = request.data.get(
+                "technicalSupportNotes"
+            )
+        if bool(request.data.get("techniciansSupervisorNotes")):
+            ticket_device_to_be_updated.technicans_supervisor_notes = request.data.get(
+                "techniciansSupervisorNotes"
+            )
 
         if (
             request.data.get("currentStage") == "agent-stage"
@@ -110,19 +125,23 @@ def ticket_devices_handler(request, ticket_id):
                 ticket_device_to_be_updated.not_completed_notes = request.data.get(
                     "notCompletedNotes"
                 )
+                ticket_device_to_be_updated.not_completed_attachment = request.data.get(
+                    "notCompletedAttachment"
+                )
                 ticket_device_to_be_updated.device_ticket_status = "Not Completed"
 
                 ticket_device_to_be_updated.save()
             elif request.data.get("redirectTicketDevice"):
                 ticket_device_to_be_updated.device_ticket_status = "Redirected"
-                ticket_device_to_be_updated.customer_service_notes = request.data.get(
+                ticket_device_to_be_updated.redirection_notes = request.data.get(
                     "redirectionNotes"
                 )
                 ticket_device_to_be_updated.save()
 
-        elif request.data.get("currentStage") == "customer-service-stage":
+        elif request.data.get("currentStage") == "redirection-stage":
 
             ticket_device_to_be_updated.not_completed_notes = None
+            ticket_device_to_be_updated.not_completed_attachment = None
             ticket_device_to_be_updated.device_ticket_status = "Under Processing"
             ticket_device_to_be_updated.customer_service_notes = None
             installationRequirementsFormsResetter(
@@ -131,6 +150,7 @@ def ticket_devices_handler(request, ticket_id):
 
             ticket_device_to_be_updated.save()
 
+        ticket_device_to_be_updated.save()
     elif request.method == "DELETE":
         models.TicketDevice.objects.filter(
             id__in=literal_eval(request.data.get("ticketDevicesToBeDeleted"))
@@ -267,6 +287,7 @@ def ticket_intializer_handler(request):
     pre_intialized_ticket = models.Ticket.objects.create(
         related_client=related_client,
         current_stage="agent-stage",
+        ticket_status="In progress",
     )
 
     for device in literal_eval(request.data.get("ticketDevices")):
@@ -333,32 +354,34 @@ def ticket_followback_call_rating_handler(request, ticket_id):
 def gas_oven_installation_requirements_form_handler(request, ticket_device_id):
     related_ticket_device = models.TicketDevice.objects.get(id=ticket_device_id)
     if request.method == "POST":
+        request_data = json.loads(request.data.get("formikValues"))
         models.GasOvenInstallationRequirementsForm.objects.create(
             related_ticket=related_ticket_device.related_ticket,
             related_ticket_device=related_ticket_device,
-            gas_oven_model_number=request.data.get("gasOvenModelNumber"),
-            gas_type=request.data.get("gasType"),
-            gas_pressure=request.data.get("gasPressure"),
+            gas_oven_model_number=request_data["gasOvenModelNumber"],
+            gas_type=request_data["gasType"],
+            gas_pressure=request_data["gasPressure"],
             ventillation_opening_below_oven_is_available=bool(
-                request.data.get("ventillationOpeningBelowOvenIsAvailable")
+                request_data["ventillationOpeningBelowOvenIsAvailable"]
             ),
-            ventillation_opening_below_oven_measurements=request.data.get(
+            ventillation_opening_below_oven_measurements=request_data[
                 "ventillationOpeningBelowOvenMeasurements"
-            ),
+            ],
             ventillation_opening_in_front_of_oven_is_available=bool(
-                request.data.get("ventillationOpeningInFrontOfOvenIsAvailable")
+                request_data["ventillationOpeningInFrontOfOvenIsAvailable"]
             ),
-            ventillation_opening_in_front_of_oven_measurements=request.data.get(
+            ventillation_opening_in_front_of_oven_measurements=request_data[
                 "ventillationOpeningInFrontOfOvenMeasurements"
-            ),
-            stabilizer_type=request.data.get("stabilizerType"),
-            gas_oven_fonia_number=request.data.get("gasOvenFoniaNumber"),
-            grill_fonia_number=request.data.get("grillFoniaNumber"),
-            whats_done_by_the_technician=request.data.get("whatsDoneByTechnician"),
-            gas_oven_final_condition=request.data.get("gasOvenFinalCondition"),
-            notes=request.data.get("whatsDoneByTechnician"),
-            client_signature=request.data.get("clientSignature"),
-            technician_name=request.data.get("technicianName"),
+            ],
+            stabilizer_type=request_data["stabilizerType"],
+            gas_oven_fonia_number=request_data["gasOvenFoniaNumber"],
+            grill_fonia_number=request_data["grillFoniaNumber"],
+            whats_done_by_the_technician=request_data["whatsDoneByTechnician"],
+            gas_oven_final_condition=request_data["gasOvenFinalCondition"],
+            notes=request_data["whatsDoneByTechnician"],
+            client_signature=request_data["clientSignature"],
+            technician_name=request_data["technicianName"],
+            attachment=request.data.get("attachment"),
         ).save()
         return Response(status=status.HTTP_201_CREATED)
     elif request.method == "GET":
@@ -383,23 +406,23 @@ def gas_oven_installation_requirements_form_handler(request, ticket_device_id):
 def electric_oven_installation_requirements_form_handler(request, ticket_device_id):
     related_ticket_device = models.TicketDevice.objects.get(id=ticket_device_id)
     if request.method == "POST":
+        request_data = json.loads(request.data.get("formikValues"))
         models.ElectricOvenInstallationRequirementsForm.objects.create(
             related_ticket=related_ticket_device.related_ticket,
             related_ticket_device=related_ticket_device,
-            electric_oven_model_number=request.data.get("electricOvenModelNumber"),
+            electric_oven_model_number=request_data["electricOvenModelNumber"],
             ventillation_opening_is_available=bool(
-                request.data.get("ventaillationOpeningIsAvailable")
+                request_data["ventaillationOpeningIsAvailable"]
             ),
-            ventillation_opening_measurements=request.data.get(
+            ventillation_opening_measurements=request_data[
                 "ventiallationOpeningMeasurements"
-            ),
-            notes=request.data.get("notes"),
-            whats_done_by_the_technician=request.data.get("whatsDoneByTechnician"),
-            electric_oven_final_condition=request.data.get(
-                "electricOvenFinalCondition"
-            ),
-            client_signature=request.data.get("clientSignature"),
-            technician_name=request.data.get("technicianName"),
+            ],
+            notes=request_data["notes"],
+            whats_done_by_the_technician=request_data["whatsDoneByTechnician"],
+            electric_oven_final_condition=request_data["electricOvenFinalCondition"],
+            client_signature=request_data["clientSignature"],
+            technician_name=request_data["technicianName"],
+            attachment=request.data("attachment"),
         ).save()
         return Response(status=status.HTTP_201_CREATED)
     elif request.method == "GET":
@@ -425,25 +448,26 @@ def slim_hob_installation_requirements_form_handler(request, ticket_device_id):
     related_ticket_device = models.TicketDevice.objects.get(id=ticket_device_id)
 
     if request.method == "POST":
-
+        request_data = json.loads(request.data.get("formikValues"))
         models.SlimHobInstallationRequirementsForm.objects.create(
             related_ticket=related_ticket_device.related_ticket,
             related_ticket_device=related_ticket_device,
-            slim_hob_model_number=request.data.get("slimHobModelNumber"),
-            gas_type=request.data.get("gasType"),
+            slim_hob_model_number=request_data["slimHobModelNumber"],
+            gas_type=request_data["gasType"],
             marble_opening_hole_is_available=bool(
-                request.data.get("marbleOpeningHoleIsAvailable")
+                request_data["marbleOpeningHoleIsAvailable"]
             ),
-            marble_opening_hole_measurements=request.data.get(
+            marble_opening_hole_measurements=request_data[
                 "marbleOpeningHoleMeasurements"
-            ),
-            gas_pressure=request.data.get("gasPressure"),
-            stabilizer_type=request.data.get("stabilizerType"),
-            whats_done_by_the_technician=request.data.get("whatsDoneByTechnician"),
-            slim_hob_final_condition=request.data.get("slimHobFinalCondition"),
-            client_signature=request.data.get("clientSignature"),
-            technician_name=request.data.get("technicianName"),
-            notes=request.data.get("slimHobFinalCondition"),
+            ],
+            gas_pressure=request_data["gasPressure"],
+            stabilizer_type=request_data["stabilizerType"],
+            whats_done_by_the_technician=request_data["whatsDoneByTechnician"],
+            slim_hob_final_condition=request_data["slimHobFinalCondition"],
+            client_signature=request_data["clientSignature"],
+            technician_name=request_data["technicianName"],
+            notes=request_data["slimHobFinalCondition"],
+            attachment=request.data.get("attachment"),
         ).save()
         return Response(status=status.HTTP_201_CREATED)
     elif request.method == "GET":
@@ -468,20 +492,22 @@ def slim_hob_installation_requirements_form_handler(request, ticket_device_id):
 def cooker_installation_requirements_form_handler(request, ticket_device_id):
     related_ticket_device = models.TicketDevice.objects.get(id=ticket_device_id)
     if request.method == "POST":
+        request_data = json.loads(request.data.get("formikValues"))
         models.CookerInstallationRequirementsForm.objects.create(
             related_ticket=related_ticket_device.related_ticket,
             related_ticket_device=related_ticket_device,
-            cooker_model_number=request.data.get("cookerModelNumber"),
-            gas_type=request.data.get("gasType"),
-            gas_pressure=request.data.get("gasPressure"),
-            notes=request.data.get("cookerFinalCondition"),
-            stabilizer_type=request.data.get("stabilizerType"),
-            cooker_fonia_number=request.data.get("cookerFoniaNumber"),
-            grill_fonia_number=request.data.get("grillFoniaNumber"),
-            whats_done_by_the_technician=request.data.get("whatsDoneByTechnician"),
-            cooker_final_condition=request.data.get("cookerFinalCondition"),
-            client_signature=request.data.get("clientSignature"),
-            technician_name=request.data.get("technicianName"),
+            cooker_model_number=request_data["cookerModelNumber"],
+            gas_type=request_data["gasType"],
+            gas_pressure=request_data["gasPressure"],
+            notes=request_data["cookerFinalCondition"],
+            stabilizer_type=request_data["stabilizerType"],
+            cooker_fonia_number=request_data["cookerFoniaNumber"],
+            grill_fonia_number=request_data["grillFoniaNumber"],
+            whats_done_by_the_technician=request_data["whatsDoneByTechnician"],
+            cooker_final_condition=request_data["cookerFinalCondition"],
+            client_signature=request_data["clientSignature"],
+            technician_name=request_data["technicianName"],
+            attachment=request.data.get("attachment"),
         ).save()
         return Response(status=status.HTTP_201_CREATED)
     elif request.method == "GET":
@@ -506,18 +532,21 @@ def cooker_installation_requirements_form_handler(request, ticket_device_id):
 def hood_installation_requirements_form_handler(request, ticket_device_id):
     related_ticket_device = models.TicketDevice.objects.get(id=ticket_device_id)
     if request.method == "POST":
+        request_data = json.loads(request.data.get("formikValues"))
+
         models.HoodInstallationRequirementsForm.objects.create(
             related_ticket=related_ticket_device.related_ticket,
             related_ticket_device=related_ticket_device,
-            hood_model_number=request.data.get("hoodModelNumber"),
-            hood_height=request.data.get("hoodHeight"),
-            hood_exhaust_height=request.data.get("hoodExhaustHeight"),
-            hood_exhaust_is_straight=bool(request.data.get("hoodExhaustIsStraight")),
-            notes=request.data.get("hoodFinalCondition"),
-            whats_done_by_the_technician=request.data.get("whatsDoneByTechnician"),
-            hood_final_condition=request.data.get("hoodFinalCondition"),
-            client_signature=request.data.get("clientSignature"),
-            technician_name=request.data.get("technicianName"),
+            hood_model_number=request_data["hoodModelNumber"],
+            hood_height=request_data["hoodHeight"],
+            hood_exhaust_height=request_data["hoodExhaustHeight"],
+            hood_exhaust_is_straight=bool(request_data["hoodExhaustIsStraight"]),
+            notes=request_data["hoodFinalCondition"],
+            whats_done_by_the_technician=request_data["whatsDoneByTechnician"],
+            hood_final_condition=request_data["hoodFinalCondition"],
+            client_signature=request_data["clientSignature"],
+            technician_name=request_data["technicianName"],
+            attachment=request.data.get("attachment"),
         ).save()
         return Response(status=status.HTTP_201_CREATED)
     elif request.method == "GET":

@@ -27,10 +27,12 @@ class Ticket(models.Model):
     )
     current_stage = models.CharField(max_length=350, verbose_name="Current Stage")
     total_cost = models.FloatField(verbose_name="Total Cost", default=0.00)
-    closed_by = models.CharField(
-        max_length=350, verbose_name="Closed By", null=True, blank=True
+    ticket_status = models.CharField(
+        verbose_name="Ticket status", null=True, blank=True, max_length=350
     )
-    is_closed = models.BooleanField(default=False, verbose_name="Is Closed")
+    ticket_forced_status = models.CharField(
+        max_length=350, verbose_name="Ticket forced status", null=True, blank=True
+    )
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Created at")
 
     class Meta:
@@ -90,13 +92,26 @@ class TicketDevice(models.Model):
     not_completed_notes = models.TextField(
         verbose_name="Not Completed Notes", null=True, blank=True
     )
+    not_completed_attachment = models.FileField(
+        verbose_name="Not completed attachment",
+        upload_to="Not_Completed_Attachment",
+        null=True,
+        blank=True,
+    )
     extra_notes = models.TextField(
         verbose_name="Extra Notes",
         null=True,
         blank=True,
     )
-    customer_service_notes = models.TextField(
-        verbose_name="Customer Service Notes", null=True, blank=True
+    agent_notes = models.TextField(verbose_name="Agent notes", null=True, blank=True)
+    technical_support_notes = models.TextField(
+        verbose_name="Technical support notes", null=True, blank=True
+    )
+    technicans_supervisor_notes = models.TextField(
+        verbose_name="Technicians supervisor notes", null=True, blank=True
+    )
+    redirection_notes = models.TextField(
+        verbose_name="Redirection notes", null=True, blank=True
     )
 
     class Meta:
@@ -213,6 +228,12 @@ class GasOvenInstallationRequirementsForm(models.Model):
     client_signature = models.CharField(max_length=350, verbose_name="Client Signature")
     technician_name = models.CharField(max_length=350, verbose_name="Technician Name")
     notes = models.TextField(verbose_name="Notes")
+    attachment = models.FileField(
+        verbose_name="Attachment",
+        upload_to="Gas_Oven_Installation_Attachment",
+        null=True,
+        blank=True,
+    )
 
 
 class ElectricOvenInstallationRequirementsForm(models.Model):
@@ -244,6 +265,13 @@ class ElectricOvenInstallationRequirementsForm(models.Model):
     )
     client_signature = models.CharField(max_length=350, verbose_name="Client Signature")
     technician_name = models.CharField(max_length=350, verbose_name="Technician Name")
+
+    attachment = models.FileField(
+        verbose_name="Attachment",
+        upload_to="Electric_Oven_Installation_Attachment",
+        null=True,
+        blank=True,
+    )
 
 
 class SlimHobInstallationRequirementsForm(models.Model):
@@ -279,6 +307,13 @@ class SlimHobInstallationRequirementsForm(models.Model):
     technician_name = models.CharField(max_length=350, verbose_name="Technician Name")
     notes = models.TextField(verbose_name="Notes")
 
+    attachment = models.FileField(
+        verbose_name="Attachment",
+        upload_to="Slim_Hob_Installation_Attachment",
+        null=True,
+        blank=True,
+    )
+
 
 class CookerInstallationRequirementsForm(models.Model):
     related_ticket = models.ForeignKey(
@@ -311,6 +346,12 @@ class CookerInstallationRequirementsForm(models.Model):
     client_signature = models.CharField(max_length=350, verbose_name="Client Signature")
     technician_name = models.CharField(max_length=350, verbose_name="Technician Name")
     notes = models.TextField(verbose_name="Notes")
+    attachment = models.FileField(
+        verbose_name="Attachment",
+        upload_to="Cooker_Installation_Attachment",
+        null=True,
+        blank=True,
+    )
 
 
 class HoodInstallationRequirementsForm(models.Model):
@@ -341,6 +382,12 @@ class HoodInstallationRequirementsForm(models.Model):
     hood_final_condition = models.TextField(verbose_name="Hood Final Condition")
     client_signature = models.CharField(max_length=350, verbose_name="Client Signature")
     technician_name = models.CharField(max_length=350, verbose_name="Technician Name")
+    attachment = models.FileField(
+        verbose_name="Attachment",
+        upload_to="Hood_Installation_Attachment",
+        null=True,
+        blank=True,
+    )
 
 
 """ End Ticket Completetion Forms """
