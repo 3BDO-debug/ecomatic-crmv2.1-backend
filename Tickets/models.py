@@ -25,6 +25,13 @@ class Ticket(models.Model):
         null=True,
         blank=True,
     )
+    related_route = models.ForeignKey(
+        Configurations_Models.Route,
+        on_delete=models.CASCADE,
+        verbose_name="Related route",
+        null=True,
+        blank=True,
+    )
     current_stage = models.CharField(max_length=350, verbose_name="Current Stage")
     total_cost = models.FloatField(verbose_name="Total Cost", default=0.00)
     ticket_status = models.CharField(
@@ -33,6 +40,7 @@ class Ticket(models.Model):
     ticket_forced_status = models.CharField(
         max_length=350, verbose_name="Ticket forced status", null=True, blank=True
     )
+
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Created at")
 
     class Meta:
@@ -166,19 +174,50 @@ class TicketDeviceService(models.Model):
         return f"New Services assigned for {self.related_ticket_device.related_client_device.related_storage_item.item_model_number}"
 
 
-class TicketFollowbackCallRating(models.Model):
+class TicketFollowUpCallRating(models.Model):
     related_ticket = models.ForeignKey(
         Ticket, on_delete=models.CASCADE, verbose_name="Related Ticket"
     )
-    rating = models.IntegerField(verbose_name="Rating")
-    notes = models.TextField(verbose_name="Notes", null=True, blank=True)
+    agent_stage_rating = models.IntegerField(
+        verbose_name="Agent stage rating", null=True, blank=True
+    )
+    technicial_support_stage_rating = models.IntegerField(
+        verbose_name="Technicial support stage rating", null=True, blank=True
+    )
+    technician_rating = models.IntegerField(
+        verbose_name="Technician rating", null=True, blank=True
+    )
+    overall_rating = models.IntegerField(
+        verbose_name="Overall rating", null=True, blank=True
+    )
+    follow_up_notes = models.TextField(
+        verbose_name="Follow up notes", null=True, blank=True
+    )
 
     class Meta:
-        verbose_name = "Ticket Followback Call Rating"
-        verbose_name_plural = "Ticket Followback Call Ratings"
+        verbose_name = "Ticket Follow Up Call Rating"
+        verbose_name_plural = "Ticket Follow Up Call Ratings"
 
     def __str__(self):
         return f"Ticket rating for {self.related_ticket.id}"
+
+
+class TicketFollowUpCallDeviceRating(models.Model):
+    related_ticket_follow_back_call = models.ForeignKey(
+        TicketFollowUpCallRating,
+        on_delete=models.CASCADE,
+        verbose_name="Related ticket follow back call device rating",
+        null=True,
+        blank=True,
+    )
+    related_ticket_device = models.ForeignKey(
+        TicketDevice,
+        on_delete=models.CASCADE,
+        verbose_name="Related ticket device",
+        null=True,
+        blank=True,
+    )
+    rating = models.IntegerField(verbose_name="Rating", null=True, blank=True)
 
 
 """ Ticket Completion Forms """

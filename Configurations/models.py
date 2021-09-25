@@ -184,3 +184,15 @@ class Region(models.Model):
 
     def __str__(self):
         return self.region_name
+
+
+class Route(models.Model):
+    route_name = models.CharField(max_length=350, verbose_name="Route name")
+    created_at = models.DateTimeField(verbose_name="Created at", auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Route"
+        verbose_name_plural = "Routes"
+
+    def __str__(self):
+        return self.route_name

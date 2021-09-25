@@ -18,4 +18,5 @@ urlpatterns = [
     ),
     path("Cities", handlers.cities_handler),
     path("Regions", handlers.regions_handler),
+    path("Routes", handlers.routes_handler),
 ]

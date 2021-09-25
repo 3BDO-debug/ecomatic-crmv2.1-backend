@@ -49,6 +49,14 @@ def ticket_details_handler(request, ticket_id):
                 if ticket.related_technician == None
                 else None
             )
+        if request.data.get("routeId"):
+            ticket.related_route = (
+                Configurations_Models.Route.objects.get(
+                    id=int(request.data.get("routeId"))
+                )
+                if ticket.related_route == None
+                else None
+            )
 
         ticket.current_stage = request.data.get("currentStage")
         ticket.ticket_status = request.data.get("ticketStatus")
@@ -317,34 +325,59 @@ def ticket_updates_handler(request):
 
 
 @api_view(["GET", "POST"])
-def ticket_followback_call_rating_handler(request, ticket_id):
-
-    if request.method == "GET":
-
-        ticket_followback_call_rating = models.TicketFollowbackCallRating.objects.get(
-            related_ticket=ticket_id
-        )
-
-        ticket_followback_call_rating_serializer = (
-            serializers.TicketFollowbackCallRatingSerializer(
-                ticket_followback_call_rating, many=False
-            )
-        )
-        return Response(data=ticket_followback_call_rating_serializer.data)
+def ticket_follow_up_call_rating_handler(request, ticket_id):
+    ticket = models.Ticket.objects.get(id=ticket_id)
     if request.method == "POST":
-        ticket_followback_call_rating = (
-            models.TicketFollowbackCallRating.objects.create(
-                related_ticket=models.Ticket.objects.get(id=ticket_id),
-                rating=int(request.data.get("rating")),
-                notes=request.data.get("notes"),
-            )
+        ticket_follow_up_call_data = literal_eval(
+            request.data.get("ticketFollowUpCallData")
         )
-        ticket_followback_call_rating_serializer = (
-            serializers.TicketFollowbackCallRatingSerializer(
-                ticket_followback_call_rating, many=False
-            )
+        ticket_follow_up_devices_data = json.loads(
+            request.data.get("ticketFollowUpDevicesData")
         )
-        return Response(data=ticket_followback_call_rating_serializer.data)
+
+        created_ticket_follow_up_call = models.TicketFollowUpCallRating.objects.create(
+            related_ticket=ticket,
+            agent_stage_rating=int(ticket_follow_up_call_data["agentStageRating"]),
+            technicial_support_stage_rating=int(
+                ticket_follow_up_call_data["technicialSupportStageRating"]
+            ),
+            technician_rating=int(ticket_follow_up_call_data["technicianRating"]),
+            overall_rating=int(ticket_follow_up_call_data["overallRating"]),
+            follow_up_notes=ticket_follow_up_call_data["followUpNotes"],
+        )
+        for device in ticket_follow_up_devices_data:
+            models.TicketFollowUpCallDeviceRating.objects.create(
+                related_ticket_follow_back_call=created_ticket_follow_up_call,
+                related_ticket_device=models.TicketDevice.objects.get(
+                    id=int(device["ticketDeviceId"])
+                ),
+                rating=int(device["rating"]),
+            ).save()
+
+        created_ticket_follow_up_call.save()
+    ticket_follow_up_call = models.TicketFollowUpCallRating.objects.get(
+        related_ticket=ticket
+    )
+    ticket_follow_up_call_serializer = serializers.TicketFollowUpCallRatingSerializer(
+        ticket_follow_up_call, many=False
+    )
+    ticket_follow_up_devices_ratings = (
+        models.TicketFollowUpCallDeviceRating.objects.filter(
+            related_ticket_follow_back_call=ticket_follow_up_call
+        )
+    )
+    ticket_follow_up_devices_ratings_serializer = (
+        serializers.TicketFollowUpCallDeviceRatingSerializer(
+            ticket_follow_up_devices_ratings, many=True
+        )
+    )
+
+    return Response(
+        data={
+            "ticket_follow_up_call": ticket_follow_up_call_serializer.data,
+            "ticket_follow_up_devices_ratings": ticket_follow_up_devices_ratings_serializer.data,
+        }
+    )
 
 
 """ Ticket Completion Forms """

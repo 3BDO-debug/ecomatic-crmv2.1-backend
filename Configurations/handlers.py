@@ -111,3 +111,10 @@ def regions_handler(request):
     regions = models.Region.objects.all()
     regions_serializer = serializers.RegionSerializer(regions, many=True)
     return Response(data=regions_serializer.data)
+
+
+@api_view(["GET"])
+def routes_handler(request):
+    routes = models.Route.objects.all().order_by("-created_at")
+    routes_serializer = serializers.RouteSerializer(routes, many=True)
+    return Response(data=routes_serializer.data)

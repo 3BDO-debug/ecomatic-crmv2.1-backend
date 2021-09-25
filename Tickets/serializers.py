@@ -10,6 +10,7 @@ class TicketSerializers(serializers.ModelSerializer):
     def to_representation(self, instance):
         rep = super(TicketSerializers, self).to_representation(instance)
         rep["client_name"] = instance.related_client.client_full_name
+        rep["client_category"] = instance.related_client.client_category.client_category
         rep["client_phone_number_1"] = instance.related_client.client_phone_number_1
         rep["client_phone_number_2"] = instance.related_client.client_phone_number_2
         rep["client_landline_number"] = instance.related_client.client_landline_number
@@ -20,7 +21,11 @@ class TicketSerializers(serializers.ModelSerializer):
         rep["client_apartment_no"] = instance.related_client.client_apartment_no
         rep["client_floor_no"] = instance.related_client.client_floor_no
         rep["client_landmark"] = instance.related_client.client_address_landmark
-
+        rep["route_name"] = (
+            instance.related_route.route_name
+            if instance.related_route
+            else "Route not yet selected"
+        )
         rep["technician_name"] = (
             f"{instance.related_technician.first_name} {instance.related_technician.last_name}"
             if instance.related_technician
@@ -31,6 +36,12 @@ class TicketSerializers(serializers.ModelSerializer):
             if instance.related_technician
             else "Technician Not Selected Yet"
         )
+        try:
+            rep["overall_rating"] = models.TicketFollowUpCallRating.objects.get(
+                related_ticket=instance.id
+            ).overall_rating
+        except:
+            rep["overall_rating"] = None
         return rep
 
 
@@ -96,11 +107,29 @@ class TicketDeviceServicepartsSerializer(serializers.ModelSerializer):
         return rep
 
 
-class TicketFollowbackCallRatingSerializer(serializers.ModelSerializer):
+class TicketFollowUpCallRatingSerializer(serializers.ModelSerializer):
     class Meta:
-        model = models.TicketFollowbackCallRating
+        model = models.TicketFollowUpCallRating
 
         fields = "__all__"
+
+
+class TicketFollowUpCallDeviceRatingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.TicketFollowUpCallDeviceRating
+        fields = "__all__"
+
+    def to_representation(self, instance):
+        rep = super(TicketFollowUpCallDeviceRatingSerializer, self).to_representation(
+            instance
+        )
+        rep[
+            "device_model_number"
+        ] = (
+            instance.related_ticket_device.related_client_device.related_storage_item.item_model_number
+        )
+
+        return rep
 
 
 """ Ticket Completion Forms """

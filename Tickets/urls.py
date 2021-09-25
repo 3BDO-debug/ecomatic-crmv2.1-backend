@@ -16,8 +16,8 @@ urlpatterns = [
     ),
     path("ticket_updates", handlers.ticket_updates_handler),
     path(
-        "Ticket-Followback-Call-Rating/<int:ticket_id>",
-        handlers.ticket_followback_call_rating_handler,
+        "Ticket-Follow-Up-Call-Rating/<int:ticket_id>",
+        handlers.ticket_follow_up_call_rating_handler,
     ),
     path(
         "Gas-Oven-Instllation-Requirements-Form/<int:ticket_device_id>",
