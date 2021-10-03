@@ -96,7 +96,9 @@ def ticket_devices_handler(request, ticket_id):
 
         if bool(request.data.get("agentNotes")):
             ticket_device_to_be_updated.agent_notes = request.data.get("agentNotes")
-
+            ticket_device_to_be_updated.agent_attachment = request.data.get(
+                "agentAttachment"
+            )
         if bool(request.data.get("technicalSupportNotes")):
             ticket_device_to_be_updated.technical_support_notes = request.data.get(
                 "technicalSupportNotes"
@@ -297,7 +299,7 @@ def ticket_intializer_handler(request):
         current_stage="agent-stage",
         ticket_status="In progress",
     )
-
+    print("dsfafs", literal_eval(request.data.get("ticketDevices")))
     for device in literal_eval(request.data.get("ticketDevices")):
 
         models.TicketDevice.objects.create(

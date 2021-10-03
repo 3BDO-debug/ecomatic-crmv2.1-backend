@@ -112,6 +112,12 @@ class TicketDevice(models.Model):
         blank=True,
     )
     agent_notes = models.TextField(verbose_name="Agent notes", null=True, blank=True)
+    agent_attachment = models.FileField(
+        upload_to="agent_attachments",
+        verbose_name="Agent attachments",
+        null=True,
+        blank=True,
+    )
     technical_support_notes = models.TextField(
         verbose_name="Technical support notes", null=True, blank=True
     )
