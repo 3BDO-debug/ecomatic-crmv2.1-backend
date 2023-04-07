@@ -46,7 +46,7 @@ def ticket_details_handler(request, ticket_id):
                 Accounts_Models.User.objects.get(
                     id=int(request.data.get("technicianId"))
                 )
-                if ticket.related_technician == None
+                if ticket.related_technician is None
                 else None
             )
         if request.data.get("routeId"):
@@ -54,7 +54,7 @@ def ticket_details_handler(request, ticket_id):
                 Configurations_Models.Route.objects.get(
                     id=int(request.data.get("routeId"))
                 )
-                if ticket.related_route == None
+                if ticket.related_route is None
                 else None
             )
 
@@ -108,10 +108,10 @@ def ticket_devices_handler(request, ticket_id):
                 "techniciansSupervisorNotes"
             )
 
-        if (
-            request.data.get("currentStage") == "agent-stage"
-            or request.data.get("currentStage") == "supervisor-stage"
-        ):
+        if request.data.get("currentStage") in [
+            "agent-stage",
+            "supervisor-stage",
+        ]:
 
             ticket_device_to_be_updated.device_ticket_type = request.data.get(
                 "deviceTicketType"

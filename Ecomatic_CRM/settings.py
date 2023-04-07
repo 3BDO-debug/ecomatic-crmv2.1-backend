@@ -9,6 +9,7 @@ https://docs.djangoproject.com/en/3.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
+
 import dj_database_url
 from pathlib import Path
 from datetime import timedelta
@@ -117,12 +118,8 @@ WSGI_APPLICATION = "Ecomatic_CRM.wsgi.application"
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-    }
+    "default": dj_database_url.config(conn_max_age=600, ssl_require=True)
 }
-DATABASES["default"] = dj_database_url.config(conn_max_age=600, ssl_require=True)
 DATABASES["default"] = dj_database_url.config(
     default="postgres://dhywkqjvvgjmov:6b60eae2bab055230c77ea80df5f0d078e319b38407448fdde83e8fa329c9b0d@ec2-35-153-114-74.compute-1.amazonaws.com:5432/d87renqn5854j7"
 )

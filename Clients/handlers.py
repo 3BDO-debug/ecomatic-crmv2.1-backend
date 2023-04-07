@@ -43,9 +43,7 @@ def client_device_warranty_status_checker(request):
         + relativedelta(months=int(request.data.get("itemWarrantyCoverage")))
     ).date()
 
-    return Response(
-        {"in_warranty": False if datetime.date.today() > warranty_expiry_date else True}
-    )
+    return Response({"in_warranty": datetime.date.today() <= warranty_expiry_date})
 
 
 @api_view(["POST"])
@@ -158,9 +156,10 @@ def client_devices_handler(request, client_id):
             )
             if request_data["purchasingDate"]
             else None,
-            expected_warranty_start_date=request_data["expectedWarrantyStartDate"]
-            if request_data["expectedWarrantyStartDate"]
-            else None,
+            expected_warranty_start_date=request_data[
+                "expectedWarrantyStartDate"
+            ]
+            or None,
             installation_status=request_data["installationStatus"],
             installation_date=convert_my_iso_8601(
                 request_data["installationDate"], timezone("EET")

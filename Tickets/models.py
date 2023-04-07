@@ -62,9 +62,9 @@ class Ticket(models.Model):
             "11": "K",
             "12": "L",
         }
-        tdy_day = str(dt.datetime.today().day)
-        tdy_month = str(dt.datetime.today().month)
-        tdy_year = str(dt.datetime.today().year)[-2:]
+        tdy_day = str(dt.datetime.now().day)
+        tdy_month = str(dt.datetime.now().month)
+        tdy_year = str(dt.datetime.now().year)[-2:]
         ticket_order = Ticket.objects.filter(created_at__gt=dt.date.today()).count() + 1
         return f"{tdy_year}{months[tdy_month]}{tdy_day}-{ticket_order}"
 
